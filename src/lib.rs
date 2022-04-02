@@ -4,7 +4,7 @@ pub mod mac_frame;
 
 #[allow(unused_imports)]
 use generic::*;
-use mac_frame::{AddrNone, PanNone};
+use mac_frame::{AddrNone, AddrShort, PanNone};
 
 pub fn test() -> frame_control::W {
     let mut v = frame_control::W::new(0);
@@ -19,15 +19,20 @@ pub fn test() -> frame_control::W {
 
 pub fn test2() {
     let _ = mac_frame::MhrDefault::new();
-    let mut v = mac_frame::Mhr::<PanNone, AddrNone, PanNone, AddrNone>::new();
-    v.frame_control.modify(|v| {
-        v.ack_request()
-            .ack_not_requested()
-            .dest_addr_mode()
-            .address_16bit()
-            .intra_pan()
-            .inter_pan()
-            .source_addr_mode()
-            .not_present()
-    });
+    let mut v = mac_frame::Mhr::<PanNone, AddrShort, PanNone, AddrNone>::new();
+    v.frame_control()
+        .modify(|v| {
+            v.ack_request()
+                .ack_not_requested()
+                .dest_addr_mode()
+                .address_16bit()
+                .intra_pan()
+                .inter_pan()
+                .source_addr_mode()
+                .not_present()
+        })
+        .frame_control()
+        .modify(|v| v.frame_pending().no_frame_pending())
+        .dest_address()
+        .modify(|v| v.set(1234));
 }
