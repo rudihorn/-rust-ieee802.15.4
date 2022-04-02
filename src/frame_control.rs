@@ -15,10 +15,20 @@ impl core::ops::Deref for W {
 #[doc = "This field contains information about the frame type, addressing and control flags."]
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum FrameTypeA {
+    #[doc = ""]
     Beacon = 0,
+    #[doc = ""]
     Data = 1,
+    #[doc = ""]
     Acknowledgement = 2,
+    #[doc = ""]
     MacCommand = 3,
+    #[doc = ""]
+    Multipurpose = 5,
+    #[doc = ""]
+    Fragment = 6,
+    #[doc = ""]
+    Extended = 7,
 }
 impl From<FrameTypeA> for u8 {
     #[inline(always)]
@@ -40,6 +50,9 @@ impl FrameTypeR {
             1 => FrameTypeA::Data,
             2 => FrameTypeA::Acknowledgement,
             3 => FrameTypeA::MacCommand,
+            5 => FrameTypeA::Multipurpose,
+            6 => FrameTypeA::Fragment,
+            7 => FrameTypeA::Extended,
             _ => unreachable!(),
         }
     }
@@ -62,6 +75,21 @@ impl FrameTypeR {
     #[inline(always)]
     pub fn is_mac_command(&self) -> bool {
         **self == FrameTypeA::MacCommand
+    }
+    #[doc = "Checks if the value of the `FrameType` field is `Multipurpose`"]
+    #[inline(always)]
+    pub fn is_multipurpose(&self) -> bool {
+        **self == FrameTypeA::Multipurpose
+    }
+    #[doc = "Checks if the value of the `FrameType` field is `Fragment`"]
+    #[inline(always)]
+    pub fn is_fragment(&self) -> bool {
+        **self == FrameTypeA::Fragment
+    }
+    #[doc = "Checks if the value of the `FrameType` field is `Extended`"]
+    #[inline(always)]
+    pub fn is_extended(&self) -> bool {
+        **self == FrameTypeA::Extended
     }
 }
 impl core::ops::Deref for FrameTypeR {
@@ -99,6 +127,21 @@ impl<'a> FrameTypeW<'a> {
     pub fn mac_command(self) -> &'a mut W {
         self.variant(FrameTypeA::MacCommand)
     }
+    #[doc = "Set the value of the `FrameType` field to `Multipurpose`"]
+    #[inline(always)]
+    pub fn multipurpose(self) -> &'a mut W {
+        self.variant(FrameTypeA::Multipurpose)
+    }
+    #[doc = "Set the value of the `FrameType` field to `Fragment`"]
+    #[inline(always)]
+    pub fn fragment(self) -> &'a mut W {
+        self.variant(FrameTypeA::Fragment)
+    }
+    #[doc = "Set the value of the `FrameType` field to `Extended`"]
+    #[inline(always)]
+    pub fn extended(self) -> &'a mut W {
+        self.variant(FrameTypeA::Extended)
+    }
     #[inline(always)]
     pub fn bits(self, value: u8) -> &'a mut W {
         self.w.bits = (self.w.bits & !(0x04 << 13)) | ((value as u16 & 0x04) << 13);
@@ -108,7 +151,9 @@ impl<'a> FrameTypeW<'a> {
 #[doc = "Specifies if the frame is encrypted using the key stored in the PIB."]
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum SecurityEnabledA {
+    #[doc = ""]
     Unencrypted = 0,
+    #[doc = ""]
     Encrypted = 1,
 }
 impl From<SecurityEnabledA> for bool {
@@ -176,7 +221,9 @@ impl<'a> SecurityEnabledW<'a> {
 #[doc = "Specifies if the sender has additional data to send to the recipient."]
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum FramePendingA {
+    #[doc = ""]
     NoFramePending = 0,
+    #[doc = ""]
     FramePending = 1,
 }
 impl From<FramePendingA> for bool {
@@ -244,7 +291,9 @@ impl<'a> FramePendingW<'a> {
 #[doc = "Specifies whether an acknowledgement is required from the recipient device."]
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum AckRequestA {
+    #[doc = ""]
     AckNotRequested = 0,
+    #[doc = ""]
     AckRequested = 1,
 }
 impl From<AckRequestA> for bool {
@@ -311,65 +360,67 @@ impl<'a> AckRequestW<'a> {
 }
 #[doc = "Specifies whether the MAC frame is to be sent within the same PAN."]
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub enum IntraPanA {
-    PanPresent = 0,
-    InterPan = 1,
+pub enum PanCompressionA {
+    #[doc = ""]
+    Compressed = 0,
+    #[doc = ""]
+    Uncompressed = 1,
 }
-impl From<IntraPanA> for bool {
+impl From<PanCompressionA> for bool {
     #[inline(always)]
-    fn from(variant: IntraPanA) -> Self {
+    fn from(variant: PanCompressionA) -> Self {
         variant as u8 != 0
     }
 }
-#[doc = "Field `IntraPan` reader - Specifies whether the MAC frame is to be sent within the same PAN."]
-pub struct IntraPanR(crate::FieldReader<bool, IntraPanA>);
-impl IntraPanR {
+#[doc = "Field `PanCompression` reader - Specifies whether the MAC frame is to be sent within the same PAN."]
+pub struct PanCompressionR(crate::FieldReader<bool, PanCompressionA>);
+impl PanCompressionR {
     #[inline(always)]
     pub(crate) fn new(bits: bool) -> Self {
-        IntraPanR(crate::FieldReader::new(bits))
+        PanCompressionR(crate::FieldReader::new(bits))
     }
     #[inline(always)]
-    pub fn variant(&self) -> IntraPanA {
+    pub fn variant(&self) -> PanCompressionA {
         match self.bits {
-            false => IntraPanA::PanPresent,
-            true => IntraPanA::InterPan,
+            false => PanCompressionA::Compressed,
+            true => PanCompressionA::Uncompressed,
         }
     }
-    #[doc = "Checks if the value of the `IntraPan` field is `PanPresent`"]
+    #[doc = "Checks if the value of the `PanCompression` field is `Compressed`"]
     #[inline(always)]
-    pub fn is_pan_present(&self) -> bool {
-        **self == IntraPanA::PanPresent
+    pub fn is_compressed(&self) -> bool {
+        **self == PanCompressionA::Compressed
     }
-    #[doc = "Checks if the value of the `IntraPan` field is `InterPan`"]
+    #[doc = "Checks if the value of the `PanCompression` field is `Uncompressed`"]
     #[inline(always)]
-    pub fn is_inter_pan(&self) -> bool {
-        **self == IntraPanA::InterPan
+    pub fn is_uncompressed(&self) -> bool {
+        **self == PanCompressionA::Uncompressed
     }
 }
-impl core::ops::Deref for IntraPanR {
-    type Target = crate::FieldReader<bool, IntraPanA>;
+impl core::ops::Deref for PanCompressionR {
+    type Target = crate::FieldReader<bool, PanCompressionA>;
     #[inline(always)]
     fn deref(&self) -> &Self::Target {
         &self.0
     }
 }
-pub struct IntraPanW<'a> {
+pub struct PanCompressionW<'a> {
     w: &'a mut W,
 }
-impl<'a> IntraPanW<'a> {
+impl<'a> PanCompressionW<'a> {
     #[inline(always)]
-    pub fn variant(self, variant: IntraPanA) -> &'a mut W {
+    pub fn variant(self, variant: PanCompressionA) -> &'a mut W {
         self.bits(variant.into())
     }
-    #[doc = "Set the value of the `IntraPan` field to `PanPresent`"]
+    #[doc = "Set the value of the `PanCompression` field to `Compressed`"]
     #[inline(always)]
-    pub fn pan_present(self) -> &'a mut W {
-        self.variant(IntraPanA::PanPresent)
+    pub fn compressed(self) -> &'a mut W {
+        self.variant(PanCompressionA::Compressed)
     }
-    #[doc = "Set the value of the `IntraPan` field to `InterPan`"]
+    #[doc = "Set the value of the `PanCompression` field to `Uncompressed`"]
     #[inline(always)]
-    pub fn inter_pan(self) -> &'a mut W {
-        self.variant(IntraPanA::InterPan)
+    pub fn uncompressed(self) -> &'a mut W {
+        self.variant(PanCompressionA::Uncompressed)
     }
     #[inline(always)]
     pub fn bits(self, value: bool) -> &'a mut W {
@@ -377,11 +428,154 @@ impl<'a> IntraPanW<'a> {
         self.w
     }
 }
+#[doc = "Specifies if the sequence number should be suppressed."]
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum SeqNrSuppressionA {
+    #[doc = ""]
+    Included = 0,
+    #[doc = ""]
+    Suppressed = 1,
+}
+impl From<SeqNrSuppressionA> for bool {
+    #[inline(always)]
+    fn from(variant: SeqNrSuppressionA) -> Self {
+        variant as u8 != 0
+    }
+}
+#[doc = "Field `SeqNrSuppression` reader - Specifies if the sequence number should be suppressed."]
+pub struct SeqNrSuppressionR(crate::FieldReader<bool, SeqNrSuppressionA>);
+impl SeqNrSuppressionR {
+    #[inline(always)]
+    pub(crate) fn new(bits: bool) -> Self {
+        SeqNrSuppressionR(crate::FieldReader::new(bits))
+    }
+    #[inline(always)]
+    pub fn variant(&self) -> SeqNrSuppressionA {
+        match self.bits {
+            false => SeqNrSuppressionA::Included,
+            true => SeqNrSuppressionA::Suppressed,
+        }
+    }
+    #[doc = "Checks if the value of the `SeqNrSuppression` field is `Included`"]
+    #[inline(always)]
+    pub fn is_included(&self) -> bool {
+        **self == SeqNrSuppressionA::Included
+    }
+    #[doc = "Checks if the value of the `SeqNrSuppression` field is `Suppressed`"]
+    #[inline(always)]
+    pub fn is_suppressed(&self) -> bool {
+        **self == SeqNrSuppressionA::Suppressed
+    }
+}
+impl core::ops::Deref for SeqNrSuppressionR {
+    type Target = crate::FieldReader<bool, SeqNrSuppressionA>;
+    #[inline(always)]
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+pub struct SeqNrSuppressionW<'a> {
+    w: &'a mut W,
+}
+impl<'a> SeqNrSuppressionW<'a> {
+    #[inline(always)]
+    pub fn variant(self, variant: SeqNrSuppressionA) -> &'a mut W {
+        self.bits(variant.into())
+    }
+    #[doc = "Set the value of the `SeqNrSuppression` field to `Included`"]
+    #[inline(always)]
+    pub fn included(self) -> &'a mut W {
+        self.variant(SeqNrSuppressionA::Included)
+    }
+    #[doc = "Set the value of the `SeqNrSuppression` field to `Suppressed`"]
+    #[inline(always)]
+    pub fn suppressed(self) -> &'a mut W {
+        self.variant(SeqNrSuppressionA::Suppressed)
+    }
+    #[inline(always)]
+    pub fn bits(self, value: bool) -> &'a mut W {
+        self.w.bits = (self.w.bits & !(0x01 << 7)) | ((value as u16 & 0x01) << 7);
+        self.w
+    }
+}
+#[doc = "Specified if Information Elements (IEs) are contained in the frame."]
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum IePresentA {
+    #[doc = ""]
+    None = 0,
+    #[doc = ""]
+    Present = 1,
+}
+impl From<IePresentA> for bool {
+    #[inline(always)]
+    fn from(variant: IePresentA) -> Self {
+        variant as u8 != 0
+    }
+}
+#[doc = "Field `IePresent` reader - Specified if Information Elements (IEs) are contained in the frame."]
+pub struct IePresentR(crate::FieldReader<bool, IePresentA>);
+impl IePresentR {
+    #[inline(always)]
+    pub(crate) fn new(bits: bool) -> Self {
+        IePresentR(crate::FieldReader::new(bits))
+    }
+    #[inline(always)]
+    pub fn variant(&self) -> IePresentA {
+        match self.bits {
+            false => IePresentA::None,
+            true => IePresentA::Present,
+        }
+    }
+    #[doc = "Checks if the value of the `IePresent` field is `None`"]
+    #[inline(always)]
+    pub fn is_none(&self) -> bool {
+        **self == IePresentA::None
+    }
+    #[doc = "Checks if the value of the `IePresent` field is `Present`"]
+    #[inline(always)]
+    pub fn is_present(&self) -> bool {
+        **self == IePresentA::Present
+    }
+}
+impl core::ops::Deref for IePresentR {
+    type Target = crate::FieldReader<bool, IePresentA>;
+    #[inline(always)]
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+pub struct IePresentW<'a> {
+    w: &'a mut W,
+}
+impl<'a> IePresentW<'a> {
+    #[inline(always)]
+    pub fn variant(self, variant: IePresentA) -> &'a mut W {
+        self.bits(variant.into())
+    }
+    #[doc = "Set the value of the `IePresent` field to `None`"]
+    #[inline(always)]
+    pub fn none(self) -> &'a mut W {
+        self.variant(IePresentA::None)
+    }
+    #[doc = "Set the value of the `IePresent` field to `Present`"]
+    #[inline(always)]
+    pub fn present(self) -> &'a mut W {
+        self.variant(IePresentA::Present)
+    }
+    #[inline(always)]
+    pub fn bits(self, value: bool) -> &'a mut W {
+        self.w.bits = (self.w.bits & !(0x01 << 6)) | ((value as u16 & 0x01) << 6);
+        self.w
+    }
+}
 #[doc = "Specifies the type of the destination address."]
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum DestAddrModeA {
+    #[doc = ""]
     NotPresent = 0,
+    #[doc = ""]
     Address16bit = 1,
+    #[doc = ""]
     Address64bitExtended = 3,
 }
 impl From<DestAddrModeA> for u8 {
@@ -458,11 +652,98 @@ impl<'a> DestAddrModeW<'a> {
         self.w
     }
 }
+#[doc = "Specifies the version of the frame"]
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum FrameVersionA {
+    #[doc = ""]
+    Version2003 = 0,
+    #[doc = ""]
+    Version2006 = 1,
+    #[doc = ""]
+    Current = 2,
+}
+impl From<FrameVersionA> for u8 {
+    #[inline(always)]
+    fn from(variant: FrameVersionA) -> Self {
+        variant as _
+    }
+}
+#[doc = "Field `FrameVersion` reader - Specifies the version of the frame"]
+pub struct FrameVersionR(crate::FieldReader<u8, FrameVersionA>);
+impl FrameVersionR {
+    #[inline(always)]
+    pub(crate) fn new(bits: u8) -> Self {
+        FrameVersionR(crate::FieldReader::new(bits))
+    }
+    #[inline(always)]
+    pub fn variant(&self) -> FrameVersionA {
+        match self.bits {
+            0 => FrameVersionA::Version2003,
+            1 => FrameVersionA::Version2006,
+            2 => FrameVersionA::Current,
+            _ => unreachable!(),
+        }
+    }
+    #[doc = "Checks if the value of the `FrameVersion` field is `Version2003`"]
+    #[inline(always)]
+    pub fn is_version_2003(&self) -> bool {
+        **self == FrameVersionA::Version2003
+    }
+    #[doc = "Checks if the value of the `FrameVersion` field is `Version2006`"]
+    #[inline(always)]
+    pub fn is_version_2006(&self) -> bool {
+        **self == FrameVersionA::Version2006
+    }
+    #[doc = "Checks if the value of the `FrameVersion` field is `Current`"]
+    #[inline(always)]
+    pub fn is_current(&self) -> bool {
+        **self == FrameVersionA::Current
+    }
+}
+impl core::ops::Deref for FrameVersionR {
+    type Target = crate::FieldReader<u8, FrameVersionA>;
+    #[inline(always)]
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+pub struct FrameVersionW<'a> {
+    w: &'a mut W,
+}
+impl<'a> FrameVersionW<'a> {
+    #[inline(always)]
+    pub fn variant(self, variant: FrameVersionA) -> &'a mut W {
+        self.bits(variant.into())
+    }
+    #[doc = "Set the value of the `FrameVersion` field to `Version2003`"]
+    #[inline(always)]
+    pub fn version_2003(self) -> &'a mut W {
+        self.variant(FrameVersionA::Version2003)
+    }
+    #[doc = "Set the value of the `FrameVersion` field to `Version2006`"]
+    #[inline(always)]
+    pub fn version_2006(self) -> &'a mut W {
+        self.variant(FrameVersionA::Version2006)
+    }
+    #[doc = "Set the value of the `FrameVersion` field to `Current`"]
+    #[inline(always)]
+    pub fn current(self) -> &'a mut W {
+        self.variant(FrameVersionA::Current)
+    }
+    #[inline(always)]
+    pub fn bits(self, value: u8) -> &'a mut W {
+        self.w.bits = (self.w.bits & !(0x02 << 2)) | ((value as u16 & 0x02) << 2);
+        self.w
+    }
+}
 #[doc = "Specifies the type of the source address."]
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum SourceAddrModeA {
+    #[doc = ""]
     NotPresent = 0,
+    #[doc = ""]
     Address16bit = 1,
+    #[doc = ""]
     Address64bitExtended = 3,
 }
 impl From<SourceAddrModeA> for u8 {
@@ -564,15 +845,30 @@ impl R {
     pub fn ack_request(&self) -> AckRequestR {
         AckRequestR::new((self.bits & 0x0400) != 0)
     }
-    #[doc = "Read the `IntraPan` field."]
+    #[doc = "Read the `PanCompression` field."]
     #[inline(always)]
-    pub fn intra_pan(&self) -> IntraPanR {
-        IntraPanR::new((self.bits & 0x0200) != 0)
+    pub fn pan_compression(&self) -> PanCompressionR {
+        PanCompressionR::new((self.bits & 0x0200) != 0)
+    }
+    #[doc = "Read the `SeqNrSuppression` field."]
+    #[inline(always)]
+    pub fn seq_nr_suppression(&self) -> SeqNrSuppressionR {
+        SeqNrSuppressionR::new((self.bits & 0x80) != 0)
+    }
+    #[doc = "Read the `IePresent` field."]
+    #[inline(always)]
+    pub fn ie_present(&self) -> IePresentR {
+        IePresentR::new((self.bits & 0x40) != 0)
     }
     #[doc = "Read the `DestAddrMode` field."]
     #[inline(always)]
     pub fn dest_addr_mode(&self) -> DestAddrModeR {
         DestAddrModeR::new(((self.bits >> 4) & 0x02) as u8)
+    }
+    #[doc = "Read the `FrameVersion` field."]
+    #[inline(always)]
+    pub fn frame_version(&self) -> FrameVersionR {
+        FrameVersionR::new(((self.bits >> 2) & 0x02) as u8)
     }
     #[doc = "Read the `SourceAddrMode` field."]
     #[inline(always)]
@@ -605,15 +901,30 @@ impl W {
     pub fn ack_request(&mut self) -> AckRequestW {
         AckRequestW { w: self }
     }
-    #[doc = "Set the `IntraPan` field."]
+    #[doc = "Set the `PanCompression` field."]
     #[inline(always)]
-    pub fn intra_pan(&mut self) -> IntraPanW {
-        IntraPanW { w: self }
+    pub fn pan_compression(&mut self) -> PanCompressionW {
+        PanCompressionW { w: self }
+    }
+    #[doc = "Set the `SeqNrSuppression` field."]
+    #[inline(always)]
+    pub fn seq_nr_suppression(&mut self) -> SeqNrSuppressionW {
+        SeqNrSuppressionW { w: self }
+    }
+    #[doc = "Set the `IePresent` field."]
+    #[inline(always)]
+    pub fn ie_present(&mut self) -> IePresentW {
+        IePresentW { w: self }
     }
     #[doc = "Set the `DestAddrMode` field."]
     #[inline(always)]
     pub fn dest_addr_mode(&mut self) -> DestAddrModeW {
         DestAddrModeW { w: self }
+    }
+    #[doc = "Set the `FrameVersion` field."]
+    #[inline(always)]
+    pub fn frame_version(&mut self) -> FrameVersionW {
+        FrameVersionW { w: self }
     }
     #[doc = "Set the `SourceAddrMode` field."]
     #[inline(always)]
