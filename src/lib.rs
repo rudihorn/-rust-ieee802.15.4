@@ -1,6 +1,9 @@
+pub mod auxiliary_security_header;
 pub mod frame_control;
 pub mod generic;
+pub mod ie_control;
 pub mod mac_frame;
+pub mod security_control;
 
 #[allow(unused_imports)]
 use generic::*;
