@@ -362,9 +362,9 @@ impl<'a> AckRequestW<'a> {
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum PanCompressionA {
     #[doc = ""]
-    Compressed = 0,
+    Uncompressed = 0,
     #[doc = ""]
-    Uncompressed = 1,
+    Compressed = 1,
 }
 impl From<PanCompressionA> for bool {
     #[inline(always)]
@@ -382,19 +382,19 @@ impl PanCompressionR {
     #[inline(always)]
     pub fn variant(&self) -> PanCompressionA {
         match self.bits {
-            false => PanCompressionA::Compressed,
-            true => PanCompressionA::Uncompressed,
+            false => PanCompressionA::Uncompressed,
+            true => PanCompressionA::Compressed,
         }
-    }
-    #[doc = "Checks if the value of the `PanCompression` field is `Compressed`"]
-    #[inline(always)]
-    pub fn is_compressed(&self) -> bool {
-        **self == PanCompressionA::Compressed
     }
     #[doc = "Checks if the value of the `PanCompression` field is `Uncompressed`"]
     #[inline(always)]
     pub fn is_uncompressed(&self) -> bool {
         **self == PanCompressionA::Uncompressed
+    }
+    #[doc = "Checks if the value of the `PanCompression` field is `Compressed`"]
+    #[inline(always)]
+    pub fn is_compressed(&self) -> bool {
+        **self == PanCompressionA::Compressed
     }
 }
 impl core::ops::Deref for PanCompressionR {
@@ -412,15 +412,15 @@ impl<'a> PanCompressionW<'a> {
     pub fn variant(self, variant: PanCompressionA) -> &'a mut W {
         self.bits(variant.into())
     }
-    #[doc = "Set the value of the `PanCompression` field to `Compressed`"]
-    #[inline(always)]
-    pub fn compressed(self) -> &'a mut W {
-        self.variant(PanCompressionA::Compressed)
-    }
     #[doc = "Set the value of the `PanCompression` field to `Uncompressed`"]
     #[inline(always)]
     pub fn uncompressed(self) -> &'a mut W {
         self.variant(PanCompressionA::Uncompressed)
+    }
+    #[doc = "Set the value of the `PanCompression` field to `Compressed`"]
+    #[inline(always)]
+    pub fn compressed(self) -> &'a mut W {
+        self.variant(PanCompressionA::Compressed)
     }
     #[inline(always)]
     pub fn bits(self, value: bool) -> &'a mut W {
@@ -574,7 +574,7 @@ pub enum DestAddrModeA {
     #[doc = ""]
     NotPresent = 0,
     #[doc = ""]
-    Address16bit = 1,
+    Address16bit = 2,
     #[doc = ""]
     Address64bitExtended = 3,
 }
@@ -595,7 +595,7 @@ impl DestAddrModeR {
     pub fn variant(&self) -> DestAddrModeA {
         match self.bits {
             0 => DestAddrModeA::NotPresent,
-            1 => DestAddrModeA::Address16bit,
+            2 => DestAddrModeA::Address16bit,
             3 => DestAddrModeA::Address64bitExtended,
             _ => unreachable!(),
         }
@@ -742,7 +742,7 @@ pub enum SourceAddrModeA {
     #[doc = ""]
     NotPresent = 0,
     #[doc = ""]
-    Address16bit = 1,
+    Address16bit = 2,
     #[doc = ""]
     Address64bitExtended = 3,
 }
@@ -763,7 +763,7 @@ impl SourceAddrModeR {
     pub fn variant(&self) -> SourceAddrModeA {
         match self.bits {
             0 => SourceAddrModeA::NotPresent,
-            1 => SourceAddrModeA::Address16bit,
+            2 => SourceAddrModeA::Address16bit,
             3 => SourceAddrModeA::Address64bitExtended,
             _ => unreachable!(),
         }

@@ -162,13 +162,6 @@ impl KeyIdLong {
         KeyId2::new(self)
     }
 }
-pub trait FrameCounterType: Copy {
-    fn default() -> Self;
-}
-enum FrameCounterTypeA {
-    FrameCounterNone,
-    FrameCounterPresent,
-}
 pub trait KeyId: Copy {
     fn default() -> Self;
 }
@@ -178,15 +171,12 @@ enum KeyIdA {
     KeyIdShort,
     KeyIdLong,
 }
-impl FrameCounterType for FrameCounterNone {
-    fn default() -> Self {
-        Self::new()
-    }
+pub trait FrameCounterType: Copy {
+    fn default() -> Self;
 }
-impl FrameCounterType for FrameCounterPresent {
-    fn default() -> Self {
-        Self::new()
-    }
+enum FrameCounterTypeA {
+    FrameCounterNone,
+    FrameCounterPresent,
 }
 impl KeyId for KeyIdNone {
     fn default() -> Self {
@@ -204,6 +194,16 @@ impl KeyId for KeyIdShort {
     }
 }
 impl KeyId for KeyIdLong {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+impl FrameCounterType for FrameCounterNone {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+impl FrameCounterType for FrameCounterPresent {
     fn default() -> Self {
         Self::new()
     }
