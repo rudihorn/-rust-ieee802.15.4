@@ -144,7 +144,7 @@ impl<'a> FrameTypeW<'a> {
     }
     #[inline(always)]
     pub fn bits(self, value: u8) -> &'a mut W {
-        self.w.bits = (self.w.bits & !(0x04 << 13)) | ((value as u16 & 0x04) << 13);
+        self.w.bits = (self.w.bits & !(0x07 << 0)) | ((value as u16 & 0x07) << 0);
         self.w
     }
 }
@@ -214,7 +214,7 @@ impl<'a> SecurityEnabledW<'a> {
     }
     #[inline(always)]
     pub fn bits(self, value: bool) -> &'a mut W {
-        self.w.bits = (self.w.bits & !(0x01 << 12)) | ((value as u16 & 0x01) << 12);
+        self.w.bits = (self.w.bits & !(0x01 << 3)) | ((value as u16 & 0x01) << 3);
         self.w
     }
 }
@@ -284,7 +284,7 @@ impl<'a> FramePendingW<'a> {
     }
     #[inline(always)]
     pub fn bits(self, value: bool) -> &'a mut W {
-        self.w.bits = (self.w.bits & !(0x01 << 11)) | ((value as u16 & 0x01) << 11);
+        self.w.bits = (self.w.bits & !(0x01 << 4)) | ((value as u16 & 0x01) << 4);
         self.w
     }
 }
@@ -354,7 +354,7 @@ impl<'a> AckRequestW<'a> {
     }
     #[inline(always)]
     pub fn bits(self, value: bool) -> &'a mut W {
-        self.w.bits = (self.w.bits & !(0x01 << 10)) | ((value as u16 & 0x01) << 10);
+        self.w.bits = (self.w.bits & !(0x01 << 5)) | ((value as u16 & 0x01) << 5);
         self.w
     }
 }
@@ -424,7 +424,7 @@ impl<'a> PanCompressionW<'a> {
     }
     #[inline(always)]
     pub fn bits(self, value: bool) -> &'a mut W {
-        self.w.bits = (self.w.bits & !(0x01 << 9)) | ((value as u16 & 0x01) << 9);
+        self.w.bits = (self.w.bits & !(0x01 << 6)) | ((value as u16 & 0x01) << 6);
         self.w
     }
 }
@@ -494,7 +494,7 @@ impl<'a> SeqNrSuppressionW<'a> {
     }
     #[inline(always)]
     pub fn bits(self, value: bool) -> &'a mut W {
-        self.w.bits = (self.w.bits & !(0x01 << 7)) | ((value as u16 & 0x01) << 7);
+        self.w.bits = (self.w.bits & !(0x01 << 8)) | ((value as u16 & 0x01) << 8);
         self.w
     }
 }
@@ -564,7 +564,7 @@ impl<'a> IePresentW<'a> {
     }
     #[inline(always)]
     pub fn bits(self, value: bool) -> &'a mut W {
-        self.w.bits = (self.w.bits & !(0x01 << 6)) | ((value as u16 & 0x01) << 6);
+        self.w.bits = (self.w.bits & !(0x01 << 9)) | ((value as u16 & 0x01) << 9);
         self.w
     }
 }
@@ -648,7 +648,7 @@ impl<'a> DestAddrModeW<'a> {
     }
     #[inline(always)]
     pub fn bits(self, value: u8) -> &'a mut W {
-        self.w.bits = (self.w.bits & !(0x02 << 4)) | ((value as u16 & 0x02) << 4);
+        self.w.bits = (self.w.bits & !(0x03 << 10)) | ((value as u16 & 0x03) << 10);
         self.w
     }
 }
@@ -732,7 +732,7 @@ impl<'a> FrameVersionW<'a> {
     }
     #[inline(always)]
     pub fn bits(self, value: u8) -> &'a mut W {
-        self.w.bits = (self.w.bits & !(0x02 << 2)) | ((value as u16 & 0x02) << 2);
+        self.w.bits = (self.w.bits & !(0x03 << 12)) | ((value as u16 & 0x03) << 12);
         self.w
     }
 }
@@ -816,7 +816,7 @@ impl<'a> SourceAddrModeW<'a> {
     }
     #[inline(always)]
     pub fn bits(self, value: u8) -> &'a mut W {
-        self.w.bits = (self.w.bits & !(0x02 << 0)) | ((value as u16 & 0x02) << 0);
+        self.w.bits = (self.w.bits & !(0x03 << 14)) | ((value as u16 & 0x03) << 14);
         self.w
     }
 }
@@ -828,52 +828,52 @@ impl R {
     #[doc = "Read the `FrameType` field."]
     #[inline(always)]
     pub fn frame_type(&self) -> FrameTypeR {
-        FrameTypeR::new(((self.bits >> 13) & 0x04) as u8)
+        FrameTypeR::new(((self.bits >> 0) & 0x07) as u8)
     }
     #[doc = "Read the `SecurityEnabled` field."]
     #[inline(always)]
     pub fn security_enabled(&self) -> SecurityEnabledR {
-        SecurityEnabledR::new((self.bits & 0x1000) != 0)
+        SecurityEnabledR::new((self.bits & 0x08) != 0)
     }
     #[doc = "Read the `FramePending` field."]
     #[inline(always)]
     pub fn frame_pending(&self) -> FramePendingR {
-        FramePendingR::new((self.bits & 0x0800) != 0)
+        FramePendingR::new((self.bits & 0x10) != 0)
     }
     #[doc = "Read the `AckRequest` field."]
     #[inline(always)]
     pub fn ack_request(&self) -> AckRequestR {
-        AckRequestR::new((self.bits & 0x0400) != 0)
+        AckRequestR::new((self.bits & 0x20) != 0)
     }
     #[doc = "Read the `PanCompression` field."]
     #[inline(always)]
     pub fn pan_compression(&self) -> PanCompressionR {
-        PanCompressionR::new((self.bits & 0x0200) != 0)
+        PanCompressionR::new((self.bits & 0x40) != 0)
     }
     #[doc = "Read the `SeqNrSuppression` field."]
     #[inline(always)]
     pub fn seq_nr_suppression(&self) -> SeqNrSuppressionR {
-        SeqNrSuppressionR::new((self.bits & 0x80) != 0)
+        SeqNrSuppressionR::new((self.bits & 0x0100) != 0)
     }
     #[doc = "Read the `IePresent` field."]
     #[inline(always)]
     pub fn ie_present(&self) -> IePresentR {
-        IePresentR::new((self.bits & 0x40) != 0)
+        IePresentR::new((self.bits & 0x0200) != 0)
     }
     #[doc = "Read the `DestAddrMode` field."]
     #[inline(always)]
     pub fn dest_addr_mode(&self) -> DestAddrModeR {
-        DestAddrModeR::new(((self.bits >> 4) & 0x02) as u8)
+        DestAddrModeR::new(((self.bits >> 10) & 0x03) as u8)
     }
     #[doc = "Read the `FrameVersion` field."]
     #[inline(always)]
     pub fn frame_version(&self) -> FrameVersionR {
-        FrameVersionR::new(((self.bits >> 2) & 0x02) as u8)
+        FrameVersionR::new(((self.bits >> 12) & 0x03) as u8)
     }
     #[doc = "Read the `SourceAddrMode` field."]
     #[inline(always)]
     pub fn source_addr_mode(&self) -> SourceAddrModeR {
-        SourceAddrModeR::new(((self.bits >> 0) & 0x02) as u8)
+        SourceAddrModeR::new(((self.bits >> 14) & 0x03) as u8)
     }
 }
 impl W {

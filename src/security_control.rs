@@ -144,7 +144,7 @@ impl<'a> SecurityLevelW<'a> {
     }
     #[inline(always)]
     pub fn bits(self, value: u8) -> &'a mut W {
-        self.w.bits = (self.w.bits & !(0x04 << 5)) | ((value as u8 & 0x04) << 5);
+        self.w.bits = (self.w.bits & !(0x07 << 0)) | ((value as u8 & 0x07) << 0);
         self.w
     }
 }
@@ -241,7 +241,7 @@ impl<'a> KeyIdentifierModeW<'a> {
     }
     #[inline(always)]
     pub fn bits(self, value: u8) -> &'a mut W {
-        self.w.bits = (self.w.bits & !(0x02 << 3)) | ((value as u8 & 0x02) << 3);
+        self.w.bits = (self.w.bits & !(0x03 << 3)) | ((value as u8 & 0x03) << 3);
         self.w
     }
 }
@@ -311,7 +311,7 @@ impl<'a> FrameCounterSuppresionW<'a> {
     }
     #[inline(always)]
     pub fn bits(self, value: bool) -> &'a mut W {
-        self.w.bits = (self.w.bits & !(0x01 << 2)) | ((value as u8 & 0x01) << 2);
+        self.w.bits = (self.w.bits & !(0x01 << 5)) | ((value as u8 & 0x01) << 5);
         self.w
     }
 }
@@ -381,7 +381,7 @@ impl<'a> AsnInNonceW<'a> {
     }
     #[inline(always)]
     pub fn bits(self, value: bool) -> &'a mut W {
-        self.w.bits = (self.w.bits & !(0x01 << 1)) | ((value as u8 & 0x01) << 1);
+        self.w.bits = (self.w.bits & !(0x01 << 6)) | ((value as u8 & 0x01) << 6);
         self.w
     }
 }
@@ -393,22 +393,22 @@ impl R {
     #[doc = "Read the `SecurityLevel` field."]
     #[inline(always)]
     pub fn security_level(&self) -> SecurityLevelR {
-        SecurityLevelR::new(((self.bits >> 5) & 0x04) as u8)
+        SecurityLevelR::new(((self.bits >> 0) & 0x07) as u8)
     }
     #[doc = "Read the `KeyIdentifierMode` field."]
     #[inline(always)]
     pub fn key_identifier_mode(&self) -> KeyIdentifierModeR {
-        KeyIdentifierModeR::new(((self.bits >> 3) & 0x02) as u8)
+        KeyIdentifierModeR::new(((self.bits >> 3) & 0x03) as u8)
     }
     #[doc = "Read the `FrameCounterSuppresion` field."]
     #[inline(always)]
     pub fn frame_counter_suppresion(&self) -> FrameCounterSuppresionR {
-        FrameCounterSuppresionR::new((self.bits & 0x04) != 0)
+        FrameCounterSuppresionR::new((self.bits & 0x20) != 0)
     }
     #[doc = "Read the `AsnInNonce` field."]
     #[inline(always)]
     pub fn asn_in_nonce(&self) -> AsnInNonceR {
-        AsnInNonceR::new((self.bits & 0x02) != 0)
+        AsnInNonceR::new((self.bits & 0x40) != 0)
     }
 }
 impl W {

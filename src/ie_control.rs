@@ -52,7 +52,7 @@ impl<'a> LengthW<'a> {
     }
     #[inline(always)]
     pub fn bits(self, value: u8) -> &'a mut W {
-        self.w.bits = (self.w.bits & !(0x40 << 9)) | ((value as u16 & 0x40) << 9);
+        self.w.bits = (self.w.bits & !(0x7f << 0)) | ((value as u16 & 0x7f) << 0);
         self.w
     }
 }
@@ -344,7 +344,7 @@ impl<'a> ElementIdW<'a> {
     }
     #[inline(always)]
     pub fn bits(self, value: u8) -> &'a mut W {
-        self.w.bits = (self.w.bits & !(0x80 << 1)) | ((value as u16 & 0x80) << 1);
+        self.w.bits = (self.w.bits & !(0xff << 7)) | ((value as u16 & 0xff) << 7);
         self.w
     }
 }
@@ -402,7 +402,7 @@ impl<'a> TypeW<'a> {
     }
     #[inline(always)]
     pub fn bits(self, value: bool) -> &'a mut W {
-        self.w.bits = (self.w.bits & !(0x01 << 0)) | ((value as u16 & 0x01) << 0);
+        self.w.bits = (self.w.bits & !(0x01 << 15)) | ((value as u16 & 0x01) << 15);
         self.w
     }
 }
@@ -414,17 +414,17 @@ impl R {
     #[doc = "Read the `Length` field."]
     #[inline(always)]
     pub fn length(&self) -> LengthR {
-        LengthR::new(((self.bits >> 9) & 0x40) as u8)
+        LengthR::new(((self.bits >> 0) & 0x7f) as u8)
     }
     #[doc = "Read the `ElementId` field."]
     #[inline(always)]
     pub fn element_id(&self) -> ElementIdR {
-        ElementIdR::new(((self.bits >> 1) & 0x80) as u8)
+        ElementIdR::new(((self.bits >> 7) & 0xff) as u8)
     }
     #[doc = "Read the `Type` field."]
     #[inline(always)]
     pub fn type_(&self) -> TypeR {
-        TypeR::new((self.bits & 0x01) != 0)
+        TypeR::new((self.bits & 0x8000) != 0)
     }
 }
 impl W {

@@ -1,3 +1,5 @@
+#![no_std]
+
 pub mod auxiliary_security_header;
 pub mod frame_control;
 pub mod generic;
