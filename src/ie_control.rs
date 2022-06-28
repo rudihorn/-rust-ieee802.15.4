@@ -1,7 +1,9 @@
 #[doc = "Specifies the type of an IE header."]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub struct R {
     bits: u16,
 }
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub struct W {
     bits: u16,
 }
@@ -48,10 +50,10 @@ pub struct LengthW<'a> {
 impl<'a> LengthW<'a> {
     #[inline(always)]
     pub fn variant(self, variant: LengthA) -> &'a mut W {
-        self.bits(variant.into())
+        unsafe { self.bits(variant.into()) }
     }
     #[inline(always)]
-    pub fn bits(self, value: u8) -> &'a mut W {
+    pub unsafe fn bits(self, value: u8) -> &'a mut W {
         self.w.bits = (self.w.bits & !(0x7f << 0)) | ((value as u16 & 0x7f) << 0);
         self.w
     }
@@ -245,7 +247,7 @@ pub struct ElementIdW<'a> {
 impl<'a> ElementIdW<'a> {
     #[inline(always)]
     pub fn variant(self, variant: ElementIdA) -> &'a mut W {
-        self.bits(variant.into())
+        unsafe { self.bits(variant.into()) }
     }
     #[doc = "Set the value of the `ElementId` field to `VendorSpecific`"]
     #[inline(always)]
@@ -343,7 +345,7 @@ impl<'a> ElementIdW<'a> {
         self.variant(ElementIdA::HeaderTermination2)
     }
     #[inline(always)]
-    pub fn bits(self, value: u8) -> &'a mut W {
+    pub unsafe fn bits(self, value: u8) -> &'a mut W {
         self.w.bits = (self.w.bits & !(0xff << 7)) | ((value as u16 & 0xff) << 7);
         self.w
     }
@@ -393,7 +395,7 @@ pub struct TypeW<'a> {
 impl<'a> TypeW<'a> {
     #[inline(always)]
     pub fn variant(self, variant: TypeA) -> &'a mut W {
-        self.bits(variant.into())
+        unsafe { self.bits(variant.into()) }
     }
     #[doc = "Set the value of the `Type` field to `Default`"]
     #[inline(always)]
@@ -401,7 +403,7 @@ impl<'a> TypeW<'a> {
         self.variant(TypeA::Default)
     }
     #[inline(always)]
-    pub fn bits(self, value: bool) -> &'a mut W {
+    pub unsafe fn bits(self, value: bool) -> &'a mut W {
         self.w.bits = (self.w.bits & !(0x01 << 15)) | ((value as u16 & 0x01) << 15);
         self.w
     }

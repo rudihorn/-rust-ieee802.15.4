@@ -1,0 +1,10 @@
+# [repr (packed)]
+# [derive (Clone , Copy)]
+pub struct GtsDescriptor < > where { short_address : u16 , config : u8 , } pub struct ShortAddress < 'a , > where { data : & 'a mut GtsDescriptor < > } impl < 'a , > ShortAddress < 'a , > where { # [inline (always)]
+pub (crate) fn new (data : & 'a mut GtsDescriptor < >) -> Self { Self { data } } # [inline (always)]
+pub fn read (& self) -> u16 { self . data . short_address } # [inline (always)]
+pub fn set (& 'a mut self , v : u16) -> & 'a mut GtsDescriptor < > { self . data . short_address = v ; self . data } } pub struct Config < 'a , > where { data : & 'a mut GtsDescriptor < > } impl < 'a , > Config < 'a , > where { # [inline (always)]
+pub (crate) fn new (data : & 'a mut GtsDescriptor < >) -> Self { Self { data } } # [inline (always)]
+pub fn read (& self) -> crate :: gts_descriptor_config :: R { crate :: gts_descriptor_config :: R :: new (self . data . config) } # [inline (always)]
+pub fn modify < F > (& 'a mut self , f : F) -> & 'a mut GtsDescriptor < > where for < 'w > F : FnOnce (& 'w mut crate :: gts_descriptor_config :: W) -> & 'w mut crate :: gts_descriptor_config :: W { let bits = self . data . config ; self . data . config = * * f (& mut crate :: gts_descriptor_config :: W :: new (bits)) ; self . data } } impl < > GtsDescriptor < > where { # [inline (always)]
+pub fn new () -> Self { Self { short_address : 0 , config : 0 , } } pub fn short_address (& mut self) -> ShortAddress < > { ShortAddress :: new (self) } pub fn config (& mut self) -> Config < > { Config :: new (self) } }

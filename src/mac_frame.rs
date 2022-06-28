@@ -64,20 +64,30 @@ impl PanShort {
         self
     }
 }
-pub trait Address: Copy {
-    fn default() -> Self;
-}
-enum AddressA {
-    AddrNone,
-    AddrShort,
-    AddrExtended,
-}
 pub trait Panid: Copy {
     fn default() -> Self;
 }
-enum PanidA {
-    PanNone,
-    PanShort,
+pub enum PanidA {
+    PanNone(PanNone),
+    PanShort(PanShort),
+}
+pub trait Address: Copy {
+    fn default() -> Self;
+}
+pub enum AddressA {
+    AddrNone(AddrNone),
+    AddrShort(AddrShort),
+    AddrExtended(AddrExtended),
+}
+impl Panid for PanNone {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+impl Panid for PanShort {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 impl Address for AddrNone {
     fn default() -> Self {
@@ -90,16 +100,6 @@ impl Address for AddrShort {
     }
 }
 impl Address for AddrExtended {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-impl Panid for PanNone {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-impl Panid for PanShort {
     fn default() -> Self {
         Self::new()
     }

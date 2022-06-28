@@ -1,7 +1,9 @@
 #[doc = "This field contains information about the frame type, addressing and control flags."]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub struct R {
     bits: u16,
 }
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub struct W {
     bits: u16,
 }
@@ -105,7 +107,7 @@ pub struct FrameTypeW<'a> {
 impl<'a> FrameTypeW<'a> {
     #[inline(always)]
     pub fn variant(self, variant: FrameTypeA) -> &'a mut W {
-        self.bits(variant.into())
+        unsafe { self.bits(variant.into()) }
     }
     #[doc = "Set the value of the `FrameType` field to `Beacon`"]
     #[inline(always)]
@@ -143,7 +145,7 @@ impl<'a> FrameTypeW<'a> {
         self.variant(FrameTypeA::Extended)
     }
     #[inline(always)]
-    pub fn bits(self, value: u8) -> &'a mut W {
+    pub unsafe fn bits(self, value: u8) -> &'a mut W {
         self.w.bits = (self.w.bits & !(0x07 << 0)) | ((value as u16 & 0x07) << 0);
         self.w
     }
@@ -200,7 +202,7 @@ pub struct SecurityEnabledW<'a> {
 impl<'a> SecurityEnabledW<'a> {
     #[inline(always)]
     pub fn variant(self, variant: SecurityEnabledA) -> &'a mut W {
-        self.bits(variant.into())
+        unsafe { self.bits(variant.into()) }
     }
     #[doc = "Set the value of the `SecurityEnabled` field to `Unencrypted`"]
     #[inline(always)]
@@ -213,7 +215,7 @@ impl<'a> SecurityEnabledW<'a> {
         self.variant(SecurityEnabledA::Encrypted)
     }
     #[inline(always)]
-    pub fn bits(self, value: bool) -> &'a mut W {
+    pub unsafe fn bits(self, value: bool) -> &'a mut W {
         self.w.bits = (self.w.bits & !(0x01 << 3)) | ((value as u16 & 0x01) << 3);
         self.w
     }
@@ -270,7 +272,7 @@ pub struct FramePendingW<'a> {
 impl<'a> FramePendingW<'a> {
     #[inline(always)]
     pub fn variant(self, variant: FramePendingA) -> &'a mut W {
-        self.bits(variant.into())
+        unsafe { self.bits(variant.into()) }
     }
     #[doc = "Set the value of the `FramePending` field to `NoFramePending`"]
     #[inline(always)]
@@ -283,7 +285,7 @@ impl<'a> FramePendingW<'a> {
         self.variant(FramePendingA::FramePending)
     }
     #[inline(always)]
-    pub fn bits(self, value: bool) -> &'a mut W {
+    pub unsafe fn bits(self, value: bool) -> &'a mut W {
         self.w.bits = (self.w.bits & !(0x01 << 4)) | ((value as u16 & 0x01) << 4);
         self.w
     }
@@ -340,7 +342,7 @@ pub struct AckRequestW<'a> {
 impl<'a> AckRequestW<'a> {
     #[inline(always)]
     pub fn variant(self, variant: AckRequestA) -> &'a mut W {
-        self.bits(variant.into())
+        unsafe { self.bits(variant.into()) }
     }
     #[doc = "Set the value of the `AckRequest` field to `AckNotRequested`"]
     #[inline(always)]
@@ -353,7 +355,7 @@ impl<'a> AckRequestW<'a> {
         self.variant(AckRequestA::AckRequested)
     }
     #[inline(always)]
-    pub fn bits(self, value: bool) -> &'a mut W {
+    pub unsafe fn bits(self, value: bool) -> &'a mut W {
         self.w.bits = (self.w.bits & !(0x01 << 5)) | ((value as u16 & 0x01) << 5);
         self.w
     }
@@ -410,7 +412,7 @@ pub struct PanCompressionW<'a> {
 impl<'a> PanCompressionW<'a> {
     #[inline(always)]
     pub fn variant(self, variant: PanCompressionA) -> &'a mut W {
-        self.bits(variant.into())
+        unsafe { self.bits(variant.into()) }
     }
     #[doc = "Set the value of the `PanCompression` field to `Uncompressed`"]
     #[inline(always)]
@@ -423,7 +425,7 @@ impl<'a> PanCompressionW<'a> {
         self.variant(PanCompressionA::Compressed)
     }
     #[inline(always)]
-    pub fn bits(self, value: bool) -> &'a mut W {
+    pub unsafe fn bits(self, value: bool) -> &'a mut W {
         self.w.bits = (self.w.bits & !(0x01 << 6)) | ((value as u16 & 0x01) << 6);
         self.w
     }
@@ -480,7 +482,7 @@ pub struct SeqNrSuppressionW<'a> {
 impl<'a> SeqNrSuppressionW<'a> {
     #[inline(always)]
     pub fn variant(self, variant: SeqNrSuppressionA) -> &'a mut W {
-        self.bits(variant.into())
+        unsafe { self.bits(variant.into()) }
     }
     #[doc = "Set the value of the `SeqNrSuppression` field to `Included`"]
     #[inline(always)]
@@ -493,7 +495,7 @@ impl<'a> SeqNrSuppressionW<'a> {
         self.variant(SeqNrSuppressionA::Suppressed)
     }
     #[inline(always)]
-    pub fn bits(self, value: bool) -> &'a mut W {
+    pub unsafe fn bits(self, value: bool) -> &'a mut W {
         self.w.bits = (self.w.bits & !(0x01 << 8)) | ((value as u16 & 0x01) << 8);
         self.w
     }
@@ -550,7 +552,7 @@ pub struct IePresentW<'a> {
 impl<'a> IePresentW<'a> {
     #[inline(always)]
     pub fn variant(self, variant: IePresentA) -> &'a mut W {
-        self.bits(variant.into())
+        unsafe { self.bits(variant.into()) }
     }
     #[doc = "Set the value of the `IePresent` field to `None`"]
     #[inline(always)]
@@ -563,7 +565,7 @@ impl<'a> IePresentW<'a> {
         self.variant(IePresentA::Present)
     }
     #[inline(always)]
-    pub fn bits(self, value: bool) -> &'a mut W {
+    pub unsafe fn bits(self, value: bool) -> &'a mut W {
         self.w.bits = (self.w.bits & !(0x01 << 9)) | ((value as u16 & 0x01) << 9);
         self.w
     }
@@ -629,7 +631,7 @@ pub struct DestAddrModeW<'a> {
 impl<'a> DestAddrModeW<'a> {
     #[inline(always)]
     pub fn variant(self, variant: DestAddrModeA) -> &'a mut W {
-        self.bits(variant.into())
+        unsafe { self.bits(variant.into()) }
     }
     #[doc = "Set the value of the `DestAddrMode` field to `NotPresent`"]
     #[inline(always)]
@@ -647,7 +649,7 @@ impl<'a> DestAddrModeW<'a> {
         self.variant(DestAddrModeA::Address64bitExtended)
     }
     #[inline(always)]
-    pub fn bits(self, value: u8) -> &'a mut W {
+    pub unsafe fn bits(self, value: u8) -> &'a mut W {
         self.w.bits = (self.w.bits & !(0x03 << 10)) | ((value as u16 & 0x03) << 10);
         self.w
     }
@@ -713,7 +715,7 @@ pub struct FrameVersionW<'a> {
 impl<'a> FrameVersionW<'a> {
     #[inline(always)]
     pub fn variant(self, variant: FrameVersionA) -> &'a mut W {
-        self.bits(variant.into())
+        unsafe { self.bits(variant.into()) }
     }
     #[doc = "Set the value of the `FrameVersion` field to `Version2003`"]
     #[inline(always)]
@@ -731,7 +733,7 @@ impl<'a> FrameVersionW<'a> {
         self.variant(FrameVersionA::Current)
     }
     #[inline(always)]
-    pub fn bits(self, value: u8) -> &'a mut W {
+    pub unsafe fn bits(self, value: u8) -> &'a mut W {
         self.w.bits = (self.w.bits & !(0x03 << 12)) | ((value as u16 & 0x03) << 12);
         self.w
     }
@@ -797,7 +799,7 @@ pub struct SourceAddrModeW<'a> {
 impl<'a> SourceAddrModeW<'a> {
     #[inline(always)]
     pub fn variant(self, variant: SourceAddrModeA) -> &'a mut W {
-        self.bits(variant.into())
+        unsafe { self.bits(variant.into()) }
     }
     #[doc = "Set the value of the `SourceAddrMode` field to `NotPresent`"]
     #[inline(always)]
@@ -815,7 +817,7 @@ impl<'a> SourceAddrModeW<'a> {
         self.variant(SourceAddrModeA::Address64bitExtended)
     }
     #[inline(always)]
-    pub fn bits(self, value: u8) -> &'a mut W {
+    pub unsafe fn bits(self, value: u8) -> &'a mut W {
         self.w.bits = (self.w.bits & !(0x03 << 14)) | ((value as u16 & 0x03) << 14);
         self.w
     }

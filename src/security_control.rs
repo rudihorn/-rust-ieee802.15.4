@@ -1,7 +1,9 @@
 #[doc = "This field provides information about what protection is applied to the frame."]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub struct R {
     bits: u8,
 }
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub struct W {
     bits: u8,
 }
@@ -105,7 +107,7 @@ pub struct SecurityLevelW<'a> {
 impl<'a> SecurityLevelW<'a> {
     #[inline(always)]
     pub fn variant(self, variant: SecurityLevelA) -> &'a mut W {
-        self.bits(variant.into())
+        unsafe { self.bits(variant.into()) }
     }
     #[doc = "Set the value of the `SecurityLevel` field to `None`"]
     #[inline(always)]
@@ -143,7 +145,7 @@ impl<'a> SecurityLevelW<'a> {
         self.variant(SecurityLevelA::EncMic128)
     }
     #[inline(always)]
-    pub fn bits(self, value: u8) -> &'a mut W {
+    pub unsafe fn bits(self, value: u8) -> &'a mut W {
         self.w.bits = (self.w.bits & !(0x07 << 0)) | ((value as u8 & 0x07) << 0);
         self.w
     }
@@ -217,7 +219,7 @@ pub struct KeyIdentifierModeW<'a> {
 impl<'a> KeyIdentifierModeW<'a> {
     #[inline(always)]
     pub fn variant(self, variant: KeyIdentifierModeA) -> &'a mut W {
-        self.bits(variant.into())
+        unsafe { self.bits(variant.into()) }
     }
     #[doc = "Set the value of the `KeyIdentifierMode` field to `Implicit`"]
     #[inline(always)]
@@ -240,7 +242,7 @@ impl<'a> KeyIdentifierModeW<'a> {
         self.variant(KeyIdentifierModeA::KeySource8)
     }
     #[inline(always)]
-    pub fn bits(self, value: u8) -> &'a mut W {
+    pub unsafe fn bits(self, value: u8) -> &'a mut W {
         self.w.bits = (self.w.bits & !(0x03 << 3)) | ((value as u8 & 0x03) << 3);
         self.w
     }
@@ -297,7 +299,7 @@ pub struct FrameCounterSuppresionW<'a> {
 impl<'a> FrameCounterSuppresionW<'a> {
     #[inline(always)]
     pub fn variant(self, variant: FrameCounterSuppresionA) -> &'a mut W {
-        self.bits(variant.into())
+        unsafe { self.bits(variant.into()) }
     }
     #[doc = "Set the value of the `FrameCounterSuppresion` field to `Present`"]
     #[inline(always)]
@@ -310,7 +312,7 @@ impl<'a> FrameCounterSuppresionW<'a> {
         self.variant(FrameCounterSuppresionA::Suppressed)
     }
     #[inline(always)]
-    pub fn bits(self, value: bool) -> &'a mut W {
+    pub unsafe fn bits(self, value: bool) -> &'a mut W {
         self.w.bits = (self.w.bits & !(0x01 << 5)) | ((value as u8 & 0x01) << 5);
         self.w
     }
@@ -367,7 +369,7 @@ pub struct AsnInNonceW<'a> {
 impl<'a> AsnInNonceW<'a> {
     #[inline(always)]
     pub fn variant(self, variant: AsnInNonceA) -> &'a mut W {
-        self.bits(variant.into())
+        unsafe { self.bits(variant.into()) }
     }
     #[doc = "Set the value of the `AsnInNonce` field to `FrameCounterNonce`"]
     #[inline(always)]
@@ -380,7 +382,7 @@ impl<'a> AsnInNonceW<'a> {
         self.variant(AsnInNonceA::AsnNonce)
     }
     #[inline(always)]
-    pub fn bits(self, value: bool) -> &'a mut W {
+    pub unsafe fn bits(self, value: bool) -> &'a mut W {
         self.w.bits = (self.w.bits & !(0x01 << 6)) | ((value as u8 & 0x01) << 6);
         self.w
     }

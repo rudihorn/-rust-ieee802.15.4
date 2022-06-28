@@ -7,6 +7,9 @@ pub mod ie_control;
 pub mod mac_frame;
 pub mod security_control;
 
+pub mod beacon;
+pub mod reader;
+
 #[allow(unused_imports)]
 use generic::*;
 use mac_frame::{AddrNone, AddrShort, PanNone};
