@@ -1,18 +1,21 @@
 use core::mem::size_of;
 
-use crate::{frame_control::{self, SourceAddrModeA}, mac_frame::{AddrExtended, AddrNone, AddrShort, AddressA, PanNone, PanShort, PanidA}};
+use crate::{
+    frame_control::{self, DestAddrModeA, SourceAddrModeA},
+    mac_frame::{AddrExtended, AddrNone, AddrShort, AddressA, PanNone, PanShort, PanidA},
+};
 
 pub struct Initial {}
 pub struct FrameControl {
     fc: frame_control::R,
 }
 pub struct SequenceNumber {
-    fc : frame_control::R,
-    seqno: Option<u8>
+    fc: frame_control::R,
+    seqno: Option<u8>,
 }
 pub struct DestPan {
     fc: frame_control::R,
-    pan : PanidA
+    pan: PanidA,
 }
 pub struct DestAddress {
     fc: frame_control::R,
@@ -20,13 +23,12 @@ pub struct DestAddress {
 }
 pub struct SourcePan {
     fc: frame_control::R,
-    pan : PanidA
+    pan: PanidA,
 }
 pub struct SourceAddress {
     fc: frame_control::R,
     address: AddressA,
 }
-
 
 pub struct Reader<'a, STATE> {
     pub dat: &'a [u8],
@@ -39,10 +41,10 @@ impl<'a, STATE> Reader<'a, STATE> {
         &v[0]
     }
 
-    unsafe fn to_state<ST>(mut self, state : ST) -> Reader<'a, ST> {
+    unsafe fn to_state<ST>(self, state: ST) -> Reader<'a, ST> {
         Reader {
             dat: self.dat,
-            state
+            state,
         }
     }
 
@@ -71,31 +73,39 @@ impl<'a> Reader<'a, FrameControl> {
         &self.state.fc
     }
 
-    pub fn to_seq_nr(self) -> Reader<'a, SequenceNumber> {
+    pub fn next(self) -> Reader<'a, SequenceNumber> {
         let fc = self.state.fc.clone();
         unsafe {
             if fc.seq_nr_suppression().bit_is_set() {
-                self.to_next_state(|seq : &'a u8| SequenceNumber { fc, seqno : Some(seq.clone()) })
-                } else {
-                    self.to_state(SequenceNumber { fc, seqno : None })
-                }
+                self.to_next_state(|seq: &'a u8| SequenceNumber {
+                    fc,
+                    seqno: Some(seq.clone()),
+                })
+            } else {
+                self.to_state(SequenceNumber { fc, seqno: None })
             }
+        }
     }
 }
 
 impl<'a> Reader<'a, SequenceNumber> {
-
     pub fn get(&self) -> Option<u8> {
         self.state.seqno
     }
 
-    pub fn to_dest_pan(self) -> Reader<'a, DestPan> {
+    pub fn next(self) -> Reader<'a, DestPan> {
         let fc = self.state.fc.clone();
         unsafe {
-            if fc.dest_addr_mode().is_not_present()                                    {
-                self.to_state(DestPan {fc, pan : PanidA::PanNone(PanNone::new())})
+            if fc.dest_addr_mode().is_not_present() {
+                self.to_state(DestPan {
+                    fc,
+                    pan: PanidA::PanNone(PanNone::new()),
+                })
             } else {
-                self.to_next_state(|pan: &'a PanShort| DestPan { fc, pan : PanidA::PanShort(pan.clone())})
+                self.to_next_state(|pan: &'a PanShort| DestPan {
+                    fc,
+                    pan: PanidA::PanShort(pan.clone()),
+                })
             }
         }
     }
@@ -106,12 +116,10 @@ impl<'a> Reader<'a, DestPan> {
         let fc = self.state.fc.clone();
         unsafe {
             match fc.dest_addr_mode().variant() {
-                DestAddrModeA::NotPresent => {
-                    self.to_next_state(|addr: &'a AddrNone| DestAddress {
-                        fc,
-                        address: AddressA::AddrNone(addr.clone()),
-                    })
-                }
+                DestAddrModeA::NotPresent => self.to_next_state(|addr: &'a AddrNone| DestAddress {
+                    fc,
+                    address: AddressA::AddrNone(addr.clone()),
+                }),
                 DestAddrModeA::Address16bit => {
                     self.to_next_state(|addr: &'a AddrShort| DestAddress {
                         fc,
@@ -139,16 +147,20 @@ impl<'a> Reader<'a, DestPan> {
             false
         };
 
-        if src_pan_present {
-            self.to_state(SourcePan { fc, pan : None })
-        } else {
-        }
-            Reader {
-                dat: &self.dat[1..2],
-                state: SourcePan { fc },
+        unsafe {
+            if src_pan_present {
+                self.to_state(SourcePan {
+                    fc,
+                    pan: PanidA::PanNone(PanNone::new()),
+                })
+            } else {
+                self.to_next_state(|pan: &'a PanShort| SourcePan {
+                    fc,
+                    pan: PanidA::PanShort(pan.clone()),
+                })
             }
+        }
     }
-
 }
 
 impl<'a> Reader<'a, SourcePan> {
@@ -177,7 +189,6 @@ impl<'a> Reader<'a, SourcePan> {
             }
         }
     }
-
 }
 
 impl<'a> Reader<'a, SourceAddress> {}

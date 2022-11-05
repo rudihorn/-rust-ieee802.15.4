@@ -1,10 +1,23 @@
+use core2::io::{Error, Read, Write};
+#[derive(Copy, Clone)]
 #[repr(packed)]
-#[derive(Clone, Copy)]
 pub struct AddrNone {}
 impl AddrNone {
     #[inline(always)]
     pub fn new() -> Self {
         Self {}
+    }
+    pub fn write<W>(&self, _out: &mut W) -> Result<(), Error>
+    where
+        W: Write,
+    {
+        Ok(())
+    }
+    pub fn read<R>(_reader: &mut R) -> Result<Self, Error>
+    where
+        R: Read,
+    {
+        Ok(Self {})
     }
 }
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -22,6 +35,23 @@ impl AddrShort {
         self.address = v;
         self
     }
+    pub fn write<W>(&self, out: &mut W) -> Result<(), Error>
+    where
+        W: Write,
+    {
+        out.write(&self.address.to_be_bytes())?;
+        Ok(())
+    }
+    pub fn read<R>(reader: &mut R) -> Result<Self, Error>
+    where
+        R: Read,
+    {
+        let mut bytes = [0u8; 2];
+        reader.read_exact(&mut bytes)?;
+        Ok(Self {
+            address: u16::from_be_bytes(bytes),
+        })
+    }
 }
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct AddrExtended {
@@ -38,14 +68,43 @@ impl AddrExtended {
         self.address = v;
         self
     }
+    pub fn write<W>(&self, out: &mut W) -> Result<(), Error>
+    where
+        W: Write,
+    {
+        out.write(&self.address.to_be_bytes())?;
+        Ok(())
+    }
+    pub fn read<R>(reader: &mut R) -> Result<Self, Error>
+    where
+        R: Read,
+    {
+        let mut bytes = [0u8; 8];
+        reader.read_exact(&mut bytes)?;
+        Ok(Self {
+            address: u64::from_be_bytes(bytes),
+        })
+    }
 }
+#[derive(Copy, Clone)]
 #[repr(packed)]
-#[derive(Clone, Copy)]
 pub struct PanNone {}
 impl PanNone {
     #[inline(always)]
     pub fn new() -> Self {
         Self {}
+    }
+    pub fn write<W>(&self, _out: &mut W) -> Result<(), Error>
+    where
+        W: Write,
+    {
+        Ok(())
+    }
+    pub fn read<R>(_reader: &mut R) -> Result<Self, Error>
+    where
+        R: Read,
+    {
+        Ok(Self {})
     }
 }
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -63,6 +122,23 @@ impl PanShort {
         self.pan = v;
         self
     }
+    pub fn write<W>(&self, out: &mut W) -> Result<(), Error>
+    where
+        W: Write,
+    {
+        out.write(&self.pan.to_be_bytes())?;
+        Ok(())
+    }
+    pub fn read<R>(reader: &mut R) -> Result<Self, Error>
+    where
+        R: Read,
+    {
+        let mut bytes = [0u8; 2];
+        reader.read_exact(&mut bytes)?;
+        Ok(Self {
+            pan: u16::from_be_bytes(bytes),
+        })
+    }
 }
 pub trait Panid: Copy {
     fn default() -> Self;
@@ -71,6 +147,20 @@ pub enum PanidA {
     PanNone(PanNone),
     PanShort(PanShort),
 }
+impl PanidA {
+    pub fn default() -> Self {
+        Self::PanNone(PanNone::default())
+    }
+    pub fn write<W>(&self, out: &mut W) -> Result<(), Error>
+    where
+        W: Write,
+    {
+        match self {
+            PanidA::PanNone(v) => v.write(out),
+            PanidA::PanShort(v) => v.write(out),
+        }
+    }
+}
 pub trait Address: Copy {
     fn default() -> Self;
 }
@@ -78,6 +168,21 @@ pub enum AddressA {
     AddrNone(AddrNone),
     AddrShort(AddrShort),
     AddrExtended(AddrExtended),
+}
+impl AddressA {
+    pub fn default() -> Self {
+        Self::AddrNone(AddrNone::default())
+    }
+    pub fn write<W>(&self, out: &mut W) -> Result<(), Error>
+    where
+        W: Write,
+    {
+        match self {
+            AddressA::AddrNone(v) => v.write(out),
+            AddressA::AddrShort(v) => v.write(out),
+            AddressA::AddrExtended(v) => v.write(out),
+        }
+    }
 }
 impl Panid for PanNone {
     fn default() -> Self {
@@ -105,7 +210,6 @@ impl Address for AddrExtended {
     }
 }
 #[repr(packed)]
-#[derive(Clone, Copy)]
 pub struct Mhr<DestPanT, DestAddressT, SourcePanT, SourceAddressT>
 where
     DestPanT: Panid,
@@ -400,6 +504,38 @@ where
         &mut self,
     ) -> SourceAddress<DestPanT, DestAddressT, SourcePanT, SourceAddressT> {
         SourceAddress::new(self)
+    }
+}
+pub struct MhrGeneric {
+    frame_control: u16,
+    sequence_number: u8,
+    dest_pan: PanidA,
+    dest_address: AddressA,
+    source_pan: PanidA,
+    source_address: AddressA,
+}
+impl MhrGeneric {
+    pub fn default() -> Self {
+        Self {
+            frame_control: 0,
+            sequence_number: 0,
+            dest_pan: PanidA::default(),
+            dest_address: AddressA::default(),
+            source_pan: PanidA::default(),
+            source_address: AddressA::default(),
+        }
+    }
+    pub unsafe fn write<W>(&self, out: &mut W) -> Result<(), Error>
+    where
+        W: Write,
+    {
+        out.write(&self.frame_control.to_be_bytes())?;
+        out.write(&self.sequence_number.to_be_bytes())?;
+        self.dest_pan.write(out)?;
+        self.dest_address.write(out)?;
+        self.source_pan.write(out)?;
+        self.source_address.write(out)?;
+        Ok(())
     }
 }
 pub type MhrDefault = Mhr<PanNone, AddrNone, PanNone, AddrNone>;

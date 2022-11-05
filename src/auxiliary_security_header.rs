@@ -1,10 +1,23 @@
+use core2::io::{Error, Read, Write};
+#[derive(Copy, Clone)]
 #[repr(packed)]
-#[derive(Clone, Copy)]
 pub struct FrameCounterNone {}
 impl FrameCounterNone {
     #[inline(always)]
     pub fn new() -> Self {
         Self {}
+    }
+    pub fn write<W>(&self, _out: &mut W) -> Result<(), Error>
+    where
+        W: Write,
+    {
+        Ok(())
+    }
+    pub fn read<R>(_reader: &mut R) -> Result<Self, Error>
+    where
+        R: Read,
+    {
+        Ok(Self {})
     }
 }
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -22,14 +35,43 @@ impl FrameCounterPresent {
         self.frame_counter = v;
         self
     }
+    pub fn write<W>(&self, out: &mut W) -> Result<(), Error>
+    where
+        W: Write,
+    {
+        out.write(&self.frame_counter.to_be_bytes())?;
+        Ok(())
+    }
+    pub fn read<R>(reader: &mut R) -> Result<Self, Error>
+    where
+        R: Read,
+    {
+        let mut bytes = [0u8; 4];
+        reader.read_exact(&mut bytes)?;
+        Ok(Self {
+            frame_counter: u32::from_be_bytes(bytes),
+        })
+    }
 }
+#[derive(Copy, Clone)]
 #[repr(packed)]
-#[derive(Clone, Copy)]
 pub struct KeyIdNone {}
 impl KeyIdNone {
     #[inline(always)]
     pub fn new() -> Self {
         Self {}
+    }
+    pub fn write<W>(&self, _out: &mut W) -> Result<(), Error>
+    where
+        W: Write,
+    {
+        Ok(())
+    }
+    pub fn read<R>(_reader: &mut R) -> Result<Self, Error>
+    where
+        R: Read,
+    {
+        Ok(Self {})
     }
 }
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -47,9 +89,26 @@ impl KeyIdOnly {
         self.key_id = v;
         self
     }
+    pub fn write<W>(&self, out: &mut W) -> Result<(), Error>
+    where
+        W: Write,
+    {
+        out.write(&self.key_id.to_be_bytes())?;
+        Ok(())
+    }
+    pub fn read<R>(reader: &mut R) -> Result<Self, Error>
+    where
+        R: Read,
+    {
+        let mut bytes = [0u8; 1];
+        reader.read_exact(&mut bytes)?;
+        Ok(Self {
+            key_id: u8::from_be_bytes(bytes),
+        })
+    }
 }
+#[derive(Copy, Clone)]
 #[repr(packed)]
-#[derive(Clone, Copy)]
 pub struct KeyIdShort {
     key_source_1: u32,
     key_id_1: u8,
@@ -104,9 +163,32 @@ impl KeyIdShort {
     pub fn key_id_1(&mut self) -> KeyId1 {
         KeyId1::new(self)
     }
+    pub fn write<W>(&self, out: &mut W) -> Result<(), Error>
+    where
+        W: Write,
+    {
+        out.write(&self.key_source_1.to_be_bytes())?;
+        out.write(&self.key_id_1.to_be_bytes())?;
+        Ok(())
+    }
+    pub fn read<R>(reader: &mut R) -> Result<Self, Error>
+    where
+        R: Read,
+    {
+        let mut buffer = [0u8; 4];
+        reader.read_exact(&mut buffer)?;
+        let key_source_1 = u32::from_be_bytes(buffer);
+        let mut buffer = [0u8; 1];
+        reader.read_exact(&mut buffer)?;
+        let key_id_1 = u8::from_be_bytes(buffer);
+        Ok(Self {
+            key_source_1,
+            key_id_1,
+        })
+    }
 }
+#[derive(Copy, Clone)]
 #[repr(packed)]
-#[derive(Clone, Copy)]
 pub struct KeyIdLong {
     key_source_2: u64,
     key_id_2: u8,
@@ -161,6 +243,29 @@ impl KeyIdLong {
     pub fn key_id_2(&mut self) -> KeyId2 {
         KeyId2::new(self)
     }
+    pub fn write<W>(&self, out: &mut W) -> Result<(), Error>
+    where
+        W: Write,
+    {
+        out.write(&self.key_source_2.to_be_bytes())?;
+        out.write(&self.key_id_2.to_be_bytes())?;
+        Ok(())
+    }
+    pub fn read<R>(reader: &mut R) -> Result<Self, Error>
+    where
+        R: Read,
+    {
+        let mut buffer = [0u8; 8];
+        reader.read_exact(&mut buffer)?;
+        let key_source_2 = u64::from_be_bytes(buffer);
+        let mut buffer = [0u8; 1];
+        reader.read_exact(&mut buffer)?;
+        let key_id_2 = u8::from_be_bytes(buffer);
+        Ok(Self {
+            key_source_2,
+            key_id_2,
+        })
+    }
 }
 pub trait FrameCounterType: Copy {
     fn default() -> Self;
@@ -168,6 +273,20 @@ pub trait FrameCounterType: Copy {
 pub enum FrameCounterTypeA {
     FrameCounterNone(FrameCounterNone),
     FrameCounterPresent(FrameCounterPresent),
+}
+impl FrameCounterTypeA {
+    pub fn default() -> Self {
+        Self::FrameCounterNone(FrameCounterNone::default())
+    }
+    pub fn write<W>(&self, out: &mut W) -> Result<(), Error>
+    where
+        W: Write,
+    {
+        match self {
+            FrameCounterTypeA::FrameCounterNone(v) => v.write(out),
+            FrameCounterTypeA::FrameCounterPresent(v) => v.write(out),
+        }
+    }
 }
 pub trait KeyId: Copy {
     fn default() -> Self;
@@ -177,6 +296,22 @@ pub enum KeyIdA {
     KeyIdOnly(KeyIdOnly),
     KeyIdShort(KeyIdShort),
     KeyIdLong(KeyIdLong),
+}
+impl KeyIdA {
+    pub fn default() -> Self {
+        Self::KeyIdNone(KeyIdNone::default())
+    }
+    pub fn write<W>(&self, out: &mut W) -> Result<(), Error>
+    where
+        W: Write,
+    {
+        match self {
+            KeyIdA::KeyIdNone(v) => v.write(out),
+            KeyIdA::KeyIdOnly(v) => v.write(out),
+            KeyIdA::KeyIdShort(v) => v.write(out),
+            KeyIdA::KeyIdLong(v) => v.write(out),
+        }
+    }
 }
 impl FrameCounterType for FrameCounterNone {
     fn default() -> Self {
@@ -209,7 +344,6 @@ impl KeyId for KeyIdLong {
     }
 }
 #[repr(packed)]
-#[derive(Clone, Copy)]
 pub struct AuxiliarySecurityHeader<FrameCounterT>
 where
     FrameCounterT: FrameCounterType,
@@ -289,6 +423,26 @@ where
     }
     pub fn frame_counter(&mut self) -> FrameCounter<FrameCounterT> {
         FrameCounter::new(self)
+    }
+}
+pub struct AuxiliarySecurityHeaderGeneric {
+    security_control: u8,
+    frame_counter: FrameCounterTypeA,
+}
+impl AuxiliarySecurityHeaderGeneric {
+    pub fn default() -> Self {
+        Self {
+            security_control: 0,
+            frame_counter: FrameCounterTypeA::default(),
+        }
+    }
+    pub unsafe fn write<W>(&self, out: &mut W) -> Result<(), Error>
+    where
+        W: Write,
+    {
+        out.write(&self.security_control.to_be_bytes())?;
+        self.frame_counter.write(out)?;
+        Ok(())
     }
 }
 pub type AuxiliarySecurityHeaderDefault = AuxiliarySecurityHeader<FrameCounterNone>;
