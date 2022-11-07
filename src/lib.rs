@@ -9,6 +9,7 @@ pub mod security_control;
 
 pub mod beacon;
 pub mod reader;
+pub mod util;
 
 #[cfg(test)]
 mod tests;

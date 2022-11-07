@@ -1,194 +1,97 @@
-use core::mem::size_of;
+use core2::io::{Error, Read};
 
 use crate::{
-    frame_control::{self, DestAddrModeA, SourceAddrModeA},
-    mac_frame::{AddrExtended, AddrNone, AddrShort, AddressA, PanNone, PanShort, PanidA},
+    frame_control::{DestAddrModeA, SourceAddrModeA},
+    mac_frame::{AddressA, MhrGeneric, PanidA},
+    util::{read_u16, read_u8},
 };
 
-pub struct Initial {}
-pub struct FrameControl {
-    fc: frame_control::R,
-}
-pub struct SequenceNumber {
-    fc: frame_control::R,
-    seqno: Option<u8>,
-}
-pub struct DestPan {
-    fc: frame_control::R,
-    pan: PanidA,
-}
-pub struct DestAddress {
-    fc: frame_control::R,
-    address: AddressA,
-}
-pub struct SourcePan {
-    fc: frame_control::R,
-    pan: PanidA,
-}
-pub struct SourceAddress {
-    fc: frame_control::R,
-    address: AddressA,
-}
-
-pub struct Reader<'a, STATE> {
-    pub dat: &'a [u8],
-    pub state: STATE,
-}
-
-impl<'a, STATE> Reader<'a, STATE> {
-    unsafe fn read<T>(&mut self) -> &'a T {
-        let (_, v, _) = self.dat.align_to::<T>();
-        &v[0]
-    }
-
-    unsafe fn to_state<ST>(self, state: ST) -> Reader<'a, ST> {
-        Reader {
-            dat: self.dat,
-            state,
-        }
-    }
-
-    unsafe fn to_next_state<T: 'a, F, ST>(mut self, f: F) -> Reader<'a, ST>
+impl MhrGeneric {
+    pub fn read<R>(reader: &mut R) -> Result<Self, Error>
     where
-        F: FnOnce(&'a T) -> ST,
+        R: Read,
     {
-        let t = self.read::<T>();
-        Reader {
-            dat: &self.dat[size_of::<T>()..],
-            state: f(t),
+        let frame_control = read_u16(reader)?;
+        // let sequence_number = reader.rhea
+        let mut mhr = MhrGeneric::default();
+        mhr.frame_control = frame_control;
+        let frame_control_r = crate::frame_control::R::new(frame_control);
+        if frame_control_r.seq_nr_suppression().bit_is_clear() {
+            mhr.sequence_number = read_u8(reader)?;
         }
-    }
-}
 
-impl<'a> Reader<'a, FrameControl> {
-    pub fn new(dat: &'a [u8]) -> Self {
-        let rd = Reader {
-            dat,
-            state: Initial {},
-        };
-        unsafe { rd.to_next_state(|fc: &'a frame_control::R| FrameControl { fc: fc.clone() }) }
-    }
-
-    pub fn get(&self) -> &frame_control::R {
-        &self.state.fc
-    }
-
-    pub fn next(self) -> Reader<'a, SequenceNumber> {
-        let fc = self.state.fc.clone();
-        unsafe {
-            if fc.seq_nr_suppression().bit_is_set() {
-                self.to_next_state(|seq: &'a u8| SequenceNumber {
-                    fc,
-                    seqno: Some(seq.clone()),
-                })
-            } else {
-                self.to_state(SequenceNumber { fc, seqno: None })
-            }
-        }
-    }
-}
-
-impl<'a> Reader<'a, SequenceNumber> {
-    pub fn get(&self) -> Option<u8> {
-        self.state.seqno
-    }
-
-    pub fn next(self) -> Reader<'a, DestPan> {
-        let fc = self.state.fc.clone();
-        unsafe {
-            if fc.dest_addr_mode().is_not_present() {
-                self.to_state(DestPan {
-                    fc,
-                    pan: PanidA::PanNone(PanNone::new()),
-                })
-            } else {
-                self.to_next_state(|pan: &'a PanShort| DestPan {
-                    fc,
-                    pan: PanidA::PanShort(pan.clone()),
-                })
-            }
-        }
-    }
-}
-
-impl<'a> Reader<'a, DestPan> {
-    pub fn to_dest_addr(self) -> Reader<'a, DestAddress> {
-        let fc = self.state.fc.clone();
-        unsafe {
-            match fc.dest_addr_mode().variant() {
-                DestAddrModeA::NotPresent => self.to_next_state(|addr: &'a AddrNone| DestAddress {
-                    fc,
-                    address: AddressA::AddrNone(addr.clone()),
-                }),
+        if !frame_control_r.frame_version().is_current() {
+            match frame_control_r.dest_addr_mode().variant() {
                 DestAddrModeA::Address16bit => {
-                    self.to_next_state(|addr: &'a AddrShort| DestAddress {
-                        fc,
-                        address: AddressA::AddrShort(addr.clone()),
-                    })
+                    mhr.dest_pan = PanidA::read_pan_short(reader)?;
+                    mhr.dest_address = AddressA::read_addr_short(reader)?;
                 }
                 DestAddrModeA::Address64bitExtended => {
-                    self.to_next_state(|addr: &'a AddrExtended| DestAddress {
-                        fc,
-                        address: AddressA::AddrExtended(addr.clone()),
-                    })
+                    mhr.dest_pan = PanidA::read_pan_short(reader)?;
+                    mhr.dest_address = AddressA::read_addr_extended(reader)?;
                 }
+                DestAddrModeA::NotPresent => {}
             }
-        }
-    }
-}
-
-impl<'a> Reader<'a, DestPan> {
-    pub fn to_source_pan(self) -> Reader<'a, SourcePan> {
-        let fc = self.state.fc;
-
-        let src_pan_present = if fc.frame_version().is_current() {
-            true
-        } else {
-            false
-        };
-
-        unsafe {
-            if src_pan_present {
-                self.to_state(SourcePan {
-                    fc,
-                    pan: PanidA::PanNone(PanNone::new()),
-                })
-            } else {
-                self.to_next_state(|pan: &'a PanShort| SourcePan {
-                    fc,
-                    pan: PanidA::PanShort(pan.clone()),
-                })
+            if frame_control_r.pan_compression().bit_is_clear()
+                && !frame_control_r.source_addr_mode().is_not_present()
+            {
+                mhr.source_pan = PanidA::read_pan_short(reader)?;
             }
-        }
-    }
-}
-
-impl<'a> Reader<'a, SourcePan> {
-    pub fn to_source_addr(self) -> Reader<'a, SourceAddress> {
-        let fc = self.state.fc.clone();
-        unsafe {
-            match fc.source_addr_mode().variant() {
-                SourceAddrModeA::NotPresent => {
-                    self.to_next_state(|addr: &'a AddrNone| SourceAddress {
-                        fc,
-                        address: AddressA::AddrNone(addr.clone()),
-                    })
-                }
+            match frame_control_r.source_addr_mode().variant() {
                 SourceAddrModeA::Address16bit => {
-                    self.to_next_state(|addr: &'a AddrShort| SourceAddress {
-                        fc,
-                        address: AddressA::AddrShort(addr.clone()),
-                    })
+                    mhr.source_address = AddressA::read_addr_short(reader)?;
                 }
                 SourceAddrModeA::Address64bitExtended => {
-                    self.to_next_state(|addr: &'a AddrExtended| SourceAddress {
-                        fc,
-                        address: AddressA::AddrExtended(addr.clone()),
-                    })
+                    mhr.dest_address = AddressA::read_addr_extended(reader)?;
+                }
+                SourceAddrModeA::NotPresent => {}
+            }
+        } else {
+            match frame_control_r.dest_addr_mode().variant() {
+                DestAddrModeA::Address16bit => {
+                    if !(frame_control_r.source_addr_mode().is_not_present()
+                        && frame_control_r.pan_compression().bit_is_set())
+                    {
+                        mhr.dest_pan = PanidA::read_pan_short(reader)?;
+                    }
+                    mhr.dest_address = AddressA::read_addr_short(reader)?;
+                }
+                DestAddrModeA::Address64bitExtended => {
+                    if !(!frame_control_r.source_addr_mode().is_address_16bit()
+                        && frame_control_r.pan_compression().bit_is_set())
+                    {
+                        mhr.dest_pan = PanidA::read_pan_short(reader)?;
+                    }
+                    mhr.dest_address = AddressA::read_addr_extended(reader)?;
+                }
+                DestAddrModeA::NotPresent => {
+                    if !frame_control_r.source_addr_mode().is_not_present()
+                        && frame_control_r.pan_compression().bit_is_set()
+                    {
+                        mhr.dest_pan = PanidA::read_pan_short(reader)?;
+                    }
+                }
+            }
+
+            match frame_control_r.source_addr_mode().variant() {
+                SourceAddrModeA::NotPresent => {}
+                SourceAddrModeA::Address16bit => {
+                    if frame_control_r.pan_compression().bit_is_clear() {
+                        mhr.source_pan = PanidA::read_pan_short(reader)?;
+                    }
+                    mhr.source_address = AddressA::read_addr_short(reader)?;
+                }
+                SourceAddrModeA::Address64bitExtended => {
+                    if frame_control_r.pan_compression().bit_is_clear()
+                        && !frame_control_r.dest_addr_mode().is_address_64bit_extended()
+                    {
+                        mhr.source_pan = PanidA::read_pan_short(reader)?;
+                    }
+                    mhr.source_address = AddressA::read_addr_extended(reader)?;
                 }
             }
         }
+
+        Ok(mhr)
     }
 }
-
-impl<'a> Reader<'a, SourceAddress> {}

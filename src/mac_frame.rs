@@ -140,27 +140,6 @@ impl PanShort {
         })
     }
 }
-pub trait Panid: Copy {
-    fn default() -> Self;
-}
-pub enum PanidA {
-    PanNone(PanNone),
-    PanShort(PanShort),
-}
-impl PanidA {
-    pub fn default() -> Self {
-        Self::PanNone(PanNone::default())
-    }
-    pub fn write<W>(&self, out: &mut W) -> Result<(), Error>
-    where
-        W: Write,
-    {
-        match self {
-            PanidA::PanNone(v) => v.write(out),
-            PanidA::PanShort(v) => v.write(out),
-        }
-    }
-}
 pub trait Address: Copy {
     fn default() -> Self;
 }
@@ -183,15 +162,56 @@ impl AddressA {
             AddressA::AddrExtended(v) => v.write(out),
         }
     }
-}
-impl Panid for PanNone {
-    fn default() -> Self {
-        Self::new()
+    pub fn read_addr_none<R>(reader: &mut R) -> Result<Self, Error>
+    where
+        R: Read,
+    {
+        Ok(AddressA::AddrNone(AddrNone::read(reader)?))
+    }
+    pub fn read_addr_short<R>(reader: &mut R) -> Result<Self, Error>
+    where
+        R: Read,
+    {
+        Ok(AddressA::AddrShort(AddrShort::read(reader)?))
+    }
+    pub fn read_addr_extended<R>(reader: &mut R) -> Result<Self, Error>
+    where
+        R: Read,
+    {
+        Ok(AddressA::AddrExtended(AddrExtended::read(reader)?))
     }
 }
-impl Panid for PanShort {
-    fn default() -> Self {
-        Self::new()
+pub trait Panid: Copy {
+    fn default() -> Self;
+}
+pub enum PanidA {
+    PanNone(PanNone),
+    PanShort(PanShort),
+}
+impl PanidA {
+    pub fn default() -> Self {
+        Self::PanNone(PanNone::default())
+    }
+    pub fn write<W>(&self, out: &mut W) -> Result<(), Error>
+    where
+        W: Write,
+    {
+        match self {
+            PanidA::PanNone(v) => v.write(out),
+            PanidA::PanShort(v) => v.write(out),
+        }
+    }
+    pub fn read_pan_none<R>(reader: &mut R) -> Result<Self, Error>
+    where
+        R: Read,
+    {
+        Ok(PanidA::PanNone(PanNone::read(reader)?))
+    }
+    pub fn read_pan_short<R>(reader: &mut R) -> Result<Self, Error>
+    where
+        R: Read,
+    {
+        Ok(PanidA::PanShort(PanShort::read(reader)?))
     }
 }
 impl Address for AddrNone {
@@ -205,6 +225,16 @@ impl Address for AddrShort {
     }
 }
 impl Address for AddrExtended {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+impl Panid for PanNone {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+impl Panid for PanShort {
     fn default() -> Self {
         Self::new()
     }
@@ -248,8 +278,8 @@ where
         Self { data }
     }
     #[inline(always)]
-    pub fn read(&self) -> crate::frame_control::R {
-        crate::frame_control::R::new(self.data.frame_control)
+    pub fn read(&self) -> super::frame_control::R {
+        super::frame_control::R::new(self.data.frame_control)
     }
     #[inline(always)]
     pub fn modify<F>(
@@ -257,10 +287,10 @@ where
         f: F,
     ) -> &'a mut Mhr<DestPanT, DestAddressT, SourcePanT, SourceAddressT>
     where
-        for<'w> F: FnOnce(&'w mut crate::frame_control::W) -> &'w mut crate::frame_control::W,
+        for<'w> F: FnOnce(&'w mut super::frame_control::W) -> &'w mut super::frame_control::W,
     {
         let bits = self.data.frame_control;
-        self.data.frame_control = **f(&mut crate::frame_control::W::new(bits));
+        self.data.frame_control = **f(&mut super::frame_control::W::new(bits));
         self.data
     }
 }
@@ -507,12 +537,12 @@ where
     }
 }
 pub struct MhrGeneric {
-    frame_control: u16,
-    sequence_number: u8,
-    dest_pan: PanidA,
-    dest_address: AddressA,
-    source_pan: PanidA,
-    source_address: AddressA,
+    pub frame_control: u16,
+    pub sequence_number: u8,
+    pub dest_pan: PanidA,
+    pub dest_address: AddressA,
+    pub source_pan: PanidA,
+    pub source_address: AddressA,
 }
 impl MhrGeneric {
     pub fn default() -> Self {

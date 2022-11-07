@@ -267,27 +267,6 @@ impl KeyIdLong {
         })
     }
 }
-pub trait FrameCounterType: Copy {
-    fn default() -> Self;
-}
-pub enum FrameCounterTypeA {
-    FrameCounterNone(FrameCounterNone),
-    FrameCounterPresent(FrameCounterPresent),
-}
-impl FrameCounterTypeA {
-    pub fn default() -> Self {
-        Self::FrameCounterNone(FrameCounterNone::default())
-    }
-    pub fn write<W>(&self, out: &mut W) -> Result<(), Error>
-    where
-        W: Write,
-    {
-        match self {
-            FrameCounterTypeA::FrameCounterNone(v) => v.write(out),
-            FrameCounterTypeA::FrameCounterPresent(v) => v.write(out),
-        }
-    }
-}
 pub trait KeyId: Copy {
     fn default() -> Self;
 }
@@ -312,15 +291,66 @@ impl KeyIdA {
             KeyIdA::KeyIdLong(v) => v.write(out),
         }
     }
-}
-impl FrameCounterType for FrameCounterNone {
-    fn default() -> Self {
-        Self::new()
+    pub fn read_key_id_none<R>(reader: &mut R) -> Result<Self, Error>
+    where
+        R: Read,
+    {
+        Ok(KeyIdA::KeyIdNone(KeyIdNone::read(reader)?))
+    }
+    pub fn read_key_id_only<R>(reader: &mut R) -> Result<Self, Error>
+    where
+        R: Read,
+    {
+        Ok(KeyIdA::KeyIdOnly(KeyIdOnly::read(reader)?))
+    }
+    pub fn read_key_id_short<R>(reader: &mut R) -> Result<Self, Error>
+    where
+        R: Read,
+    {
+        Ok(KeyIdA::KeyIdShort(KeyIdShort::read(reader)?))
+    }
+    pub fn read_key_id_long<R>(reader: &mut R) -> Result<Self, Error>
+    where
+        R: Read,
+    {
+        Ok(KeyIdA::KeyIdLong(KeyIdLong::read(reader)?))
     }
 }
-impl FrameCounterType for FrameCounterPresent {
-    fn default() -> Self {
-        Self::new()
+pub trait FrameCounterType: Copy {
+    fn default() -> Self;
+}
+pub enum FrameCounterTypeA {
+    FrameCounterNone(FrameCounterNone),
+    FrameCounterPresent(FrameCounterPresent),
+}
+impl FrameCounterTypeA {
+    pub fn default() -> Self {
+        Self::FrameCounterNone(FrameCounterNone::default())
+    }
+    pub fn write<W>(&self, out: &mut W) -> Result<(), Error>
+    where
+        W: Write,
+    {
+        match self {
+            FrameCounterTypeA::FrameCounterNone(v) => v.write(out),
+            FrameCounterTypeA::FrameCounterPresent(v) => v.write(out),
+        }
+    }
+    pub fn read_frame_counter_none<R>(reader: &mut R) -> Result<Self, Error>
+    where
+        R: Read,
+    {
+        Ok(FrameCounterTypeA::FrameCounterNone(FrameCounterNone::read(
+            reader,
+        )?))
+    }
+    pub fn read_frame_counter_present<R>(reader: &mut R) -> Result<Self, Error>
+    where
+        R: Read,
+    {
+        Ok(FrameCounterTypeA::FrameCounterPresent(
+            FrameCounterPresent::read(reader)?,
+        ))
     }
 }
 impl KeyId for KeyIdNone {
@@ -339,6 +369,16 @@ impl KeyId for KeyIdShort {
     }
 }
 impl KeyId for KeyIdLong {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+impl FrameCounterType for FrameCounterNone {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+impl FrameCounterType for FrameCounterPresent {
     fn default() -> Self {
         Self::new()
     }
@@ -366,16 +406,16 @@ where
         Self { data }
     }
     #[inline(always)]
-    pub fn read(&self) -> crate::security_control::R {
-        crate::security_control::R::new(self.data.security_control)
+    pub fn read(&self) -> super::security_control::R {
+        super::security_control::R::new(self.data.security_control)
     }
     #[inline(always)]
     pub fn modify<F>(&'a mut self, f: F) -> &'a mut AuxiliarySecurityHeader<FrameCounterT>
     where
-        for<'w> F: FnOnce(&'w mut crate::security_control::W) -> &'w mut crate::security_control::W,
+        for<'w> F: FnOnce(&'w mut super::security_control::W) -> &'w mut super::security_control::W,
     {
         let bits = self.data.security_control;
-        self.data.security_control = **f(&mut crate::security_control::W::new(bits));
+        self.data.security_control = **f(&mut super::security_control::W::new(bits));
         self.data
     }
 }
@@ -426,8 +466,8 @@ where
     }
 }
 pub struct AuxiliarySecurityHeaderGeneric {
-    security_control: u8,
-    frame_counter: FrameCounterTypeA,
+    pub security_control: u8,
+    pub frame_counter: FrameCounterTypeA,
 }
 impl AuxiliarySecurityHeaderGeneric {
     pub fn default() -> Self {
