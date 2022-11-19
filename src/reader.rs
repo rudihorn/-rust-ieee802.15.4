@@ -11,9 +11,9 @@ impl MhrGeneric {
     where
         R: Read,
     {
-        let frame_control = read_u16(reader)?;
-        // let sequence_number = reader.rhea
         let mut mhr = MhrGeneric::default();
+
+        let frame_control = read_u16(reader)?;
         mhr.frame_control = frame_control;
         let frame_control_r = crate::frame_control::R::new(frame_control);
         if frame_control_r.seq_nr_suppression().bit_is_clear() {

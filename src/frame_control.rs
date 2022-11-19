@@ -26,6 +26,8 @@ pub enum FrameTypeA {
     #[doc = ""]
     MacCommand = 3,
     #[doc = ""]
+    Reserved = 4,
+    #[doc = ""]
     Multipurpose = 5,
     #[doc = ""]
     Fragment = 6,
@@ -52,6 +54,7 @@ impl FrameTypeR {
             1 => FrameTypeA::Data,
             2 => FrameTypeA::Acknowledgement,
             3 => FrameTypeA::MacCommand,
+            4 => FrameTypeA::Reserved,
             5 => FrameTypeA::Multipurpose,
             6 => FrameTypeA::Fragment,
             7 => FrameTypeA::Extended,
@@ -77,6 +80,11 @@ impl FrameTypeR {
     #[inline(always)]
     pub fn is_mac_command(&self) -> bool {
         **self == FrameTypeA::MacCommand
+    }
+    #[doc = "Checks if the value of the `FrameType` field is `Reserved`"]
+    #[inline(always)]
+    pub fn is_reserved(&self) -> bool {
+        **self == FrameTypeA::Reserved
     }
     #[doc = "Checks if the value of the `FrameType` field is `Multipurpose`"]
     #[inline(always)]
@@ -128,6 +136,11 @@ impl<'a> FrameTypeW<'a> {
     #[inline(always)]
     pub fn mac_command(self) -> &'a mut W {
         self.variant(FrameTypeA::MacCommand)
+    }
+    #[doc = "Set the value of the `FrameType` field to `Reserved`"]
+    #[inline(always)]
+    pub fn reserved(self) -> &'a mut W {
+        self.variant(FrameTypeA::Reserved)
     }
     #[doc = "Set the value of the `FrameType` field to `Multipurpose`"]
     #[inline(always)]

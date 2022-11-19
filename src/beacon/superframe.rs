@@ -14,138 +14,6 @@ impl core::ops::Deref for W {
         &self.bits
     }
 }
-#[doc = "This field contains information about the transmission interval of the beacon."]
-#[derive(Clone, Copy, Debug, PartialEq)]
-pub enum BeaconOrderA {}
-impl From<BeaconOrderA> for u8 {
-    #[inline(always)]
-    fn from(variant: BeaconOrderA) -> Self {
-        variant as _
-    }
-}
-#[doc = "Field `BeaconOrder` reader - This field contains information about the transmission interval of the beacon."]
-pub struct BeaconOrderR(crate::FieldReader<u8, BeaconOrderA>);
-impl BeaconOrderR {
-    #[inline(always)]
-    pub(crate) fn new(bits: u8) -> Self {
-        BeaconOrderR(crate::FieldReader::new(bits))
-    }
-    #[inline(always)]
-    pub fn variant(&self) -> BeaconOrderA {
-        match self.bits {
-            _ => unreachable!(),
-        }
-    }
-}
-impl core::ops::Deref for BeaconOrderR {
-    type Target = crate::FieldReader<u8, BeaconOrderA>;
-    #[inline(always)]
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-pub struct BeaconOrderW<'a> {
-    w: &'a mut W,
-}
-impl<'a> BeaconOrderW<'a> {
-    #[inline(always)]
-    pub fn variant(self, variant: BeaconOrderA) -> &'a mut W {
-        unsafe { self.bits(variant.into()) }
-    }
-    #[inline(always)]
-    pub unsafe fn bits(self, value: u8) -> &'a mut W {
-        self.w.bits = (self.w.bits & !(0x0f << 0)) | ((value as u16 & 0x0f) << 0);
-        self.w
-    }
-}
-#[doc = "This field contains information about the transmission duration of the beacon."]
-#[derive(Clone, Copy, Debug, PartialEq)]
-pub enum SuperframeOrderA {}
-impl From<SuperframeOrderA> for u8 {
-    #[inline(always)]
-    fn from(variant: SuperframeOrderA) -> Self {
-        variant as _
-    }
-}
-#[doc = "Field `SuperframeOrder` reader - This field contains information about the transmission duration of the beacon."]
-pub struct SuperframeOrderR(crate::FieldReader<u8, SuperframeOrderA>);
-impl SuperframeOrderR {
-    #[inline(always)]
-    pub(crate) fn new(bits: u8) -> Self {
-        SuperframeOrderR(crate::FieldReader::new(bits))
-    }
-    #[inline(always)]
-    pub fn variant(&self) -> SuperframeOrderA {
-        match self.bits {
-            _ => unreachable!(),
-        }
-    }
-}
-impl core::ops::Deref for SuperframeOrderR {
-    type Target = crate::FieldReader<u8, SuperframeOrderA>;
-    #[inline(always)]
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-pub struct SuperframeOrderW<'a> {
-    w: &'a mut W,
-}
-impl<'a> SuperframeOrderW<'a> {
-    #[inline(always)]
-    pub fn variant(self, variant: SuperframeOrderA) -> &'a mut W {
-        unsafe { self.bits(variant.into()) }
-    }
-    #[inline(always)]
-    pub unsafe fn bits(self, value: u8) -> &'a mut W {
-        self.w.bits = (self.w.bits & !(0x0f << 4)) | ((value as u16 & 0x0f) << 4);
-        self.w
-    }
-}
-#[doc = "This fied specifies the final superframe slot utilized by the CAP."]
-#[derive(Clone, Copy, Debug, PartialEq)]
-pub enum FinalCapSlotA {}
-impl From<FinalCapSlotA> for u8 {
-    #[inline(always)]
-    fn from(variant: FinalCapSlotA) -> Self {
-        variant as _
-    }
-}
-#[doc = "Field `FinalCapSlot` reader - This fied specifies the final superframe slot utilized by the CAP."]
-pub struct FinalCapSlotR(crate::FieldReader<u8, FinalCapSlotA>);
-impl FinalCapSlotR {
-    #[inline(always)]
-    pub(crate) fn new(bits: u8) -> Self {
-        FinalCapSlotR(crate::FieldReader::new(bits))
-    }
-    #[inline(always)]
-    pub fn variant(&self) -> FinalCapSlotA {
-        match self.bits {
-            _ => unreachable!(),
-        }
-    }
-}
-impl core::ops::Deref for FinalCapSlotR {
-    type Target = crate::FieldReader<u8, FinalCapSlotA>;
-    #[inline(always)]
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-pub struct FinalCapSlotW<'a> {
-    w: &'a mut W,
-}
-impl<'a> FinalCapSlotW<'a> {
-    #[inline(always)]
-    pub fn variant(self, variant: FinalCapSlotA) -> &'a mut W {
-        unsafe { self.bits(variant.into()) }
-    }
-    #[inline(always)]
-    pub unsafe fn bits(self, value: u8) -> &'a mut W {
-        self.w.bits = (self.w.bits & !(0x0f << 8)) | ((value as u16 & 0x0f) << 8);
-        self.w
-    }
-}
 #[doc = "Set if the frames transmitted are required to start before battery life extended periods."]
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum BattLifeExtA {
@@ -286,69 +154,69 @@ impl<'a> PanCoordinatorW<'a> {
         self.w
     }
 }
-#[doc = "Specifices if devices are permitted to join the PAN."]
+#[doc = "Specifies if devices are permitted to join the PAN."]
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub enum AssocationPermitA {
+pub enum AssociationPermitA {
     #[doc = "Devices are not permitted to associate with the PAN."]
     NotPermitted = 0,
     #[doc = "Devices are permitted to associate with the PAN."]
     Permitted = 1,
 }
-impl From<AssocationPermitA> for bool {
+impl From<AssociationPermitA> for bool {
     #[inline(always)]
-    fn from(variant: AssocationPermitA) -> Self {
+    fn from(variant: AssociationPermitA) -> Self {
         variant as u8 != 0
     }
 }
-#[doc = "Field `AssocationPermit` reader - Specifices if devices are permitted to join the PAN."]
-pub struct AssocationPermitR(crate::FieldReader<bool, AssocationPermitA>);
-impl AssocationPermitR {
+#[doc = "Field `AssociationPermit` reader - Specifies if devices are permitted to join the PAN."]
+pub struct AssociationPermitR(crate::FieldReader<bool, AssociationPermitA>);
+impl AssociationPermitR {
     #[inline(always)]
     pub(crate) fn new(bits: bool) -> Self {
-        AssocationPermitR(crate::FieldReader::new(bits))
+        AssociationPermitR(crate::FieldReader::new(bits))
     }
     #[inline(always)]
-    pub fn variant(&self) -> AssocationPermitA {
+    pub fn variant(&self) -> AssociationPermitA {
         match self.bits {
-            false => AssocationPermitA::NotPermitted,
-            true => AssocationPermitA::Permitted,
+            false => AssociationPermitA::NotPermitted,
+            true => AssociationPermitA::Permitted,
         }
     }
-    #[doc = "Checks if the value of the `AssocationPermit` field is `NotPermitted`"]
+    #[doc = "Checks if the value of the `AssociationPermit` field is `NotPermitted`"]
     #[inline(always)]
     pub fn is_not_permitted(&self) -> bool {
-        **self == AssocationPermitA::NotPermitted
+        **self == AssociationPermitA::NotPermitted
     }
-    #[doc = "Checks if the value of the `AssocationPermit` field is `Permitted`"]
+    #[doc = "Checks if the value of the `AssociationPermit` field is `Permitted`"]
     #[inline(always)]
     pub fn is_permitted(&self) -> bool {
-        **self == AssocationPermitA::Permitted
+        **self == AssociationPermitA::Permitted
     }
 }
-impl core::ops::Deref for AssocationPermitR {
-    type Target = crate::FieldReader<bool, AssocationPermitA>;
+impl core::ops::Deref for AssociationPermitR {
+    type Target = crate::FieldReader<bool, AssociationPermitA>;
     #[inline(always)]
     fn deref(&self) -> &Self::Target {
         &self.0
     }
 }
-pub struct AssocationPermitW<'a> {
+pub struct AssociationPermitW<'a> {
     w: &'a mut W,
 }
-impl<'a> AssocationPermitW<'a> {
+impl<'a> AssociationPermitW<'a> {
     #[inline(always)]
-    pub fn variant(self, variant: AssocationPermitA) -> &'a mut W {
+    pub fn variant(self, variant: AssociationPermitA) -> &'a mut W {
         unsafe { self.bits(variant.into()) }
     }
-    #[doc = "Set the value of the `AssocationPermit` field to `NotPermitted`"]
+    #[doc = "Set the value of the `AssociationPermit` field to `NotPermitted`"]
     #[inline(always)]
     pub fn not_permitted(self) -> &'a mut W {
-        self.variant(AssocationPermitA::NotPermitted)
+        self.variant(AssociationPermitA::NotPermitted)
     }
-    #[doc = "Set the value of the `AssocationPermit` field to `Permitted`"]
+    #[doc = "Set the value of the `AssociationPermit` field to `Permitted`"]
     #[inline(always)]
     pub fn permitted(self) -> &'a mut W {
-        self.variant(AssocationPermitA::Permitted)
+        self.variant(AssociationPermitA::Permitted)
     }
     #[inline(always)]
     pub unsafe fn bits(self, value: bool) -> &'a mut W {
@@ -363,18 +231,18 @@ impl R {
     }
     #[doc = "Read the `BeaconOrder` field."]
     #[inline(always)]
-    pub fn beacon_order(&self) -> BeaconOrderR {
-        BeaconOrderR::new(((self.bits >> 0) & 0x0f) as u8)
+    pub fn beacon_order(&self) -> u8 {
+        ((self.bits >> 0) & 0x0f) as u8
     }
     #[doc = "Read the `SuperframeOrder` field."]
     #[inline(always)]
-    pub fn superframe_order(&self) -> SuperframeOrderR {
-        SuperframeOrderR::new(((self.bits >> 4) & 0x0f) as u8)
+    pub fn superframe_order(&self) -> u8 {
+        ((self.bits >> 4) & 0x0f) as u8
     }
     #[doc = "Read the `FinalCapSlot` field."]
     #[inline(always)]
-    pub fn final_cap_slot(&self) -> FinalCapSlotR {
-        FinalCapSlotR::new(((self.bits >> 8) & 0x0f) as u8)
+    pub fn final_cap_slot(&self) -> u8 {
+        ((self.bits >> 8) & 0x0f) as u8
     }
     #[doc = "Read the `BattLifeExt` field."]
     #[inline(always)]
@@ -386,10 +254,10 @@ impl R {
     pub fn pan_coordinator(&self) -> PanCoordinatorR {
         PanCoordinatorR::new((self.bits & 0x4000) != 0)
     }
-    #[doc = "Read the `AssocationPermit` field."]
+    #[doc = "Read the `AssociationPermit` field."]
     #[inline(always)]
-    pub fn assocation_permit(&self) -> AssocationPermitR {
-        AssocationPermitR::new((self.bits & 0x8000) != 0)
+    pub fn association_permit(&self) -> AssociationPermitR {
+        AssociationPermitR::new((self.bits & 0x8000) != 0)
     }
 }
 impl W {
@@ -399,18 +267,21 @@ impl W {
     }
     #[doc = "Set the `BeaconOrder` field."]
     #[inline(always)]
-    pub fn beacon_order(&mut self) -> BeaconOrderW {
-        BeaconOrderW { w: self }
+    pub fn beacon_order(&mut self, value: u8) -> Self {
+        let bits = (self.bits & !(0x0f << 0)) | ((value as u16 & 0x0f) << 0);
+        Self { bits, ..*self }
     }
     #[doc = "Set the `SuperframeOrder` field."]
     #[inline(always)]
-    pub fn superframe_order(&mut self) -> SuperframeOrderW {
-        SuperframeOrderW { w: self }
+    pub fn superframe_order(&mut self, value: u8) -> Self {
+        let bits = (self.bits & !(0x0f << 4)) | ((value as u16 & 0x0f) << 4);
+        Self { bits, ..*self }
     }
     #[doc = "Set the `FinalCapSlot` field."]
     #[inline(always)]
-    pub fn final_cap_slot(&mut self) -> FinalCapSlotW {
-        FinalCapSlotW { w: self }
+    pub fn final_cap_slot(&mut self, value: u8) -> Self {
+        let bits = (self.bits & !(0x0f << 8)) | ((value as u16 & 0x0f) << 8);
+        Self { bits, ..*self }
     }
     #[doc = "Set the `BattLifeExt` field."]
     #[inline(always)]
@@ -422,9 +293,9 @@ impl W {
     pub fn pan_coordinator(&mut self) -> PanCoordinatorW {
         PanCoordinatorW { w: self }
     }
-    #[doc = "Set the `AssocationPermit` field."]
+    #[doc = "Set the `AssociationPermit` field."]
     #[inline(always)]
-    pub fn assocation_permit(&mut self) -> AssocationPermitW {
-        AssocationPermitW { w: self }
+    pub fn association_permit(&mut self) -> AssociationPermitW {
+        AssociationPermitW { w: self }
     }
 }

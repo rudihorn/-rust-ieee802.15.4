@@ -8,7 +8,10 @@ pub mod mac_frame;
 pub mod security_control;
 
 pub mod beacon;
+pub mod mac_command;
 pub mod reader;
+pub mod reader_auxiliary_security_header;
+pub mod reader_gts_info;
 pub mod util;
 
 #[cfg(test)]
@@ -17,6 +20,8 @@ mod tests;
 #[allow(unused_imports)]
 use generic::*;
 use mac_frame::{AddrNone, AddrShort, PanNone};
+
+pub type Error = core2::io::Error;
 
 pub fn test() -> frame_control::W {
     let mut v = frame_control::W::new(0);

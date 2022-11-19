@@ -14,50 +14,6 @@ impl core::ops::Deref for W {
         &self.bits
     }
 }
-#[doc = "The number of guaranteed timeslot descriptors included."]
-#[derive(Clone, Copy, Debug, PartialEq)]
-pub enum DescriptorCountA {}
-impl From<DescriptorCountA> for u8 {
-    #[inline(always)]
-    fn from(variant: DescriptorCountA) -> Self {
-        variant as _
-    }
-}
-#[doc = "Field `DescriptorCount` reader - The number of guaranteed timeslot descriptors included."]
-pub struct DescriptorCountR(crate::FieldReader<u8, DescriptorCountA>);
-impl DescriptorCountR {
-    #[inline(always)]
-    pub(crate) fn new(bits: u8) -> Self {
-        DescriptorCountR(crate::FieldReader::new(bits))
-    }
-    #[inline(always)]
-    pub fn variant(&self) -> DescriptorCountA {
-        match self.bits {
-            _ => unreachable!(),
-        }
-    }
-}
-impl core::ops::Deref for DescriptorCountR {
-    type Target = crate::FieldReader<u8, DescriptorCountA>;
-    #[inline(always)]
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-pub struct DescriptorCountW<'a> {
-    w: &'a mut W,
-}
-impl<'a> DescriptorCountW<'a> {
-    #[inline(always)]
-    pub fn variant(self, variant: DescriptorCountA) -> &'a mut W {
-        unsafe { self.bits(variant.into()) }
-    }
-    #[inline(always)]
-    pub unsafe fn bits(self, value: u8) -> &'a mut W {
-        self.w.bits = (self.w.bits & !(0x07 << 0)) | ((value as u8 & 0x07) << 0);
-        self.w
-    }
-}
 #[doc = "Specifies if the coordinator is accepting guaranteed timeslot requests."]
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum PermitA {
@@ -135,8 +91,8 @@ impl R {
     }
     #[doc = "Read the `DescriptorCount` field."]
     #[inline(always)]
-    pub fn descriptor_count(&self) -> DescriptorCountR {
-        DescriptorCountR::new(((self.bits >> 0) & 0x07) as u8)
+    pub fn descriptor_count(&self) -> u8 {
+        ((self.bits >> 0) & 0x07) as u8
     }
     #[doc = "Read the `Permit` field."]
     #[inline(always)]
@@ -151,8 +107,9 @@ impl W {
     }
     #[doc = "Set the `DescriptorCount` field."]
     #[inline(always)]
-    pub fn descriptor_count(&mut self) -> DescriptorCountW {
-        DescriptorCountW { w: self }
+    pub fn descriptor_count(&mut self, value: u8) -> Self {
+        let bits = (self.bits & !(0x07 << 0)) | ((value as u8 & 0x07) << 0);
+        Self { bits, ..*self }
     }
     #[doc = "Set the `Permit` field."]
     #[inline(always)]
